@@ -16,10 +16,10 @@ os.environ.setdefault("USE_TF", "0")
 os.environ.setdefault("USE_TORCH", "1")
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 
+import laya
 import torch
 from huggingface_hub import snapshot_download
 
-import laya
 from laya_router.backends.base import BackendName
 from laya_router.questions import QUESTIONS
 from laya_router.schema import Decision, TriageResult

@@ -60,6 +60,12 @@ select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
 # The figures and the write-up use real typography: x, - and the like are intentional in display strings.
 ignore = ["RUF001", "RUF002", "RUF003"]
 
+[tool.ruff.lint.isort]
+# The SDK is called `laya` and so is the directory this repo is usually cloned into, which is enough for
+# ruff to classify the import as first-party on one machine and third-party on another. Saying so here
+# keeps `ruff check` deciding the same thing locally and in CI.
+known-third-party = ["laya"]
+
 [tool.ty.environment]
 python-version = "3.12"
 
