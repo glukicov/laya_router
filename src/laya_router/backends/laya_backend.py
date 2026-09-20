@@ -22,7 +22,7 @@ from huggingface_hub import snapshot_download
 
 from laya_router.backends.base import BackendName
 from laya_router.questions import QUESTIONS
-from laya_router.schema import Decision, TriageResult
+from laya_router.schema import Decision, RouteResult
 
 MODEL_ID = "convaiinnovations/laya"
 
@@ -91,14 +91,14 @@ class LayaBackend:
         self.warmup_seconds = perf_counter() - started
         return self.warmup_seconds
 
-    def classify(self, message: str) -> TriageResult:
+    def classify(self, message: str) -> RouteResult:
         """Answer every question about `message` in a single forward pass."""
         with self._lock, torch.inference_mode():
             started = perf_counter()
             raw = self.agent.predict({"message": message}, QUESTIONS)
             latency_ms = (perf_counter() - started) * 1_000
 
-        return TriageResult(
+        return RouteResult(
             backend="laya",
             model=self.model,
             decisions={qid: _decision(qid, answer) for qid, answer in raw["answers"].items()},

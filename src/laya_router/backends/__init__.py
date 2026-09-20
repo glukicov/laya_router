@@ -1,4 +1,4 @@
-"""Interchangeable triage backends.
+"""Interchangeable routing backends.
 
 `build` is the only entry point the service and the evaluation use, so adding a third brain means
 adding a module here and one line below, not touching either caller.

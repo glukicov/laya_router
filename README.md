@@ -60,7 +60,7 @@ uv sync --all-extras
 # Serve it. First run downloads 843 MB of weights; the model then stays resident.
 uv run laya-router serve --backend laya
 
-curl -s localhost:8000/triage -H 'content-type: application/json' \
+curl -s localhost:8000/route -H 'content-type: application/json' \
   -d '{"message":"Design a multi-region active-active architecture for our payments service."}' | python3 -m json.tool
 ```
 
@@ -95,7 +95,7 @@ k8s/kind/down.sh
 src/laya_router/
   questions.py     the one schema both routers answer; the OpenAI prompt and JSON schema are generated from it
   backends/        laya_backend.py (resident, one forward pass) · openai_backend.py (structured outputs)
-  service.py       FastAPI: /triage, /health, /questions
+  service.py       FastAPI: /route, /health, /questions
   evaluate.py      run a router over the labelled set · audit the gold labels with an independent model
   metrics.py       accuracy, macro F1, ECE, deferral, overspend vs underspend — dependency-free
   ablation.py      how much of a router's accuracy is really its prompt?

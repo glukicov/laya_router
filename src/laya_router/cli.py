@@ -14,7 +14,7 @@ from laya_router.evaluate import RESULTS, agreement, label_blind, run
 from laya_router.metrics import score
 from laya_router.questions import ROUTE_ID
 
-app = typer.Typer(add_completion=False, help="One triage job, two brains: Laya against an OpenAI classifier.")
+app = typer.Typer(add_completion=False, help="One routing job, two brains: Laya against an OpenAI classifier.")
 eval_app = typer.Typer(add_completion=False, help="Run and score the head-to-head evaluation.")
 app.add_typer(eval_app, name="eval")
 
@@ -61,7 +61,7 @@ def serve(
     device: str = typer.Option("auto", help="Torch device for the Laya backend: auto, mps, cuda or cpu."),
     model: str = typer.Option("", help="Model id for the OpenAI backend."),
 ) -> None:
-    """Serve /triage with one warm, resident backend."""
+    """Serve /route with one warm, resident backend."""
     import uvicorn
 
     from laya_router.service import create_app
@@ -78,7 +78,7 @@ def serve(
 
 @app.command()
 def classify(
-    message: Annotated[str, typer.Argument(help="The support message to triage.")],
+    message: Annotated[str, typer.Argument(help="The user request to route.")],
     backend: BackendOption = "laya",
     device: str = typer.Option("auto"),
     model: str = typer.Option(""),

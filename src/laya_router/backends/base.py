@@ -1,8 +1,8 @@
-"""What every triage backend must provide."""
+"""What every routing backend must provide."""
 
 from typing import Literal, Protocol, runtime_checkable
 
-from laya_router.schema import TriageResult
+from laya_router.schema import RouteResult
 
 BackendName = Literal["laya", "openai"]
 
@@ -23,6 +23,6 @@ class Backend(Protocol):
         """
         ...
 
-    def classify(self, message: str) -> TriageResult:
+    def classify(self, message: str) -> RouteResult:
         """Answer every question about one message."""
         ...

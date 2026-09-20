@@ -13,7 +13,7 @@ from typing import Any
 
 from laya_router.backends.base import BackendName
 from laya_router.questions import BOOLEAN_IDS, TIERS, render_for_prompt
-from laya_router.schema import Decision, TriageResult
+from laya_router.schema import Decision, RouteResult
 
 DEFAULT_MODEL = "gpt-5-nano"
 
@@ -105,7 +105,7 @@ class OpenAIBackend:
         self.classify("Convert 10 miles to kilometres.")
         return perf_counter() - started
 
-    def classify(self, message: str) -> TriageResult:
+    def classify(self, message: str) -> RouteResult:
         """Send one message and parse the schema-constrained reply."""
         started = perf_counter()
         response = self.client.chat.completions.create(
@@ -116,7 +116,7 @@ class OpenAIBackend:
             ],
             response_format={
                 "type": "json_schema",
-                "json_schema": {"name": "triage", "strict": True, "schema": self._schema},
+                "json_schema": {"name": "route", "strict": True, "schema": self._schema},
             },
         )
         latency_ms = (perf_counter() - started) * 1_000
@@ -130,7 +130,7 @@ class OpenAIBackend:
         for qid in BOOLEAN_IDS:
             decisions[qid] = _boolean_decision(payload, qid)
 
-        return TriageResult(
+        return RouteResult(
             backend="openai",
             model=self.model,
             decisions=decisions,

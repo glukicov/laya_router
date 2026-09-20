@@ -8,7 +8,7 @@ from typing import Any
 
 from laya_router.backends.base import BackendName
 from laya_router.questions import BOOLEAN_IDS, TIERS
-from laya_router.schema import Decision, TriageResult
+from laya_router.schema import Decision, RouteResult
 
 DEFAULT_ROUTE = {"tier": "medium", "needs_tools": "false", "is_sensitive": "true"}
 
@@ -32,7 +32,7 @@ class FakeBackend:
         self.warmup_seconds = 0.25
         return self.warmup_seconds
 
-    def classify(self, message: str) -> TriageResult:
+    def classify(self, message: str) -> RouteResult:
         self.seen.append(message)
         chosen = self.answers.get(message, DEFAULT_ROUTE)
         decisions = {
@@ -44,7 +44,7 @@ class FakeBackend:
         }
         for qid in BOOLEAN_IDS:
             decisions[qid] = Decision(answer=chosen[qid], confidence=0.8, probabilities={chosen[qid]: 0.8})
-        return TriageResult(
+        return RouteResult(
             backend="laya",
             model=self.model,
             decisions=decisions,

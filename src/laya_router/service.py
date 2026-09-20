@@ -1,4 +1,4 @@
-"""The triage service: one endpoint, one backend chosen at startup.
+"""The routing service: one endpoint, one backend chosen at startup.
 
 Whichever brain is configured, callers see the same request and the same response, which is the
 claim this repo is testing. The backend is built and warmed during the lifespan so the process is
@@ -18,13 +18,13 @@ from laya_router import __version__
 from laya_router.backends import build
 from laya_router.backends.base import Backend, BackendName
 from laya_router.questions import QUESTIONS
-from laya_router.schema import TriageResult
+from laya_router.schema import RouteResult
 
 LOGGER = logging.getLogger(__name__)
 BackendBuilder = Callable[[], Backend]
 
 
-class TriageRequest(BaseModel):
+class RouteRequest(BaseModel):
     """One inbound support message."""
 
     model_config = ConfigDict(extra="forbid")
@@ -51,7 +51,7 @@ def get_backend(request: Request) -> Backend:
     return backend
 
 
-router = APIRouter(tags=["triage"])
+router = APIRouter(tags=["routing"])
 
 
 @router.get("/health", response_model=HealthResponse)
@@ -73,11 +73,11 @@ async def questions() -> dict[str, Any]:
     return QUESTIONS
 
 
-@router.post("/triage", response_model=TriageResult)
-async def triage(
-    request: TriageRequest,
+@router.post("/route", response_model=RouteResult)
+async def route(
+    request: RouteRequest,
     backend: Annotated[Backend, Depends(get_backend)],
-) -> TriageResult:
+) -> RouteResult:
     """Classify one message with the configured backend."""
     return await run_in_threadpool(backend.classify, request.message)
 

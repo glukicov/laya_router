@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the CPU image, create a local kind cluster, and serve /triage on http://127.0.0.1:8080.
+# Build the CPU image, create a local kind cluster, and serve /route on http://127.0.0.1:8080.
 #
 # Every kubectl call names the context explicitly and writes to a dedicated kubeconfig, so whatever context your
 # shell has selected is never touched.
@@ -39,7 +39,7 @@ cat <<'MSG'
 Ready. Try it:
 
   curl -s localhost:8080/health | python3 -m json.tool
-  curl -s localhost:8080/triage -H 'content-type: application/json' \
+  curl -s localhost:8080/route -H 'content-type: application/json' \
     -d '{"message":"The API is returning 500 errors after today deploy."}' | python3 -m json.tool
 
 Tear down with k8s/kind/down.sh

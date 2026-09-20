@@ -27,8 +27,8 @@ class Decision(BaseModel):
     probabilities: dict[str, float] = Field(default_factory=dict)
 
 
-class TriageResult(BaseModel):
-    """Every decision for one message, plus what the call cost in time and money."""
+class RouteResult(BaseModel):
+    """Every decision for one request, plus what the routing call cost in time and money."""
 
     model_config = ConfigDict(extra="forbid")
 

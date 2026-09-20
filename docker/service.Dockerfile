@@ -1,4 +1,4 @@
-# The Laya triage service as a Linux container, for the kind deployment.
+# The Laya routing service as a Linux container, for the kind deployment.
 #
 #   docker build -f docker/service.Dockerfile -t laya-router:cpu .
 #
