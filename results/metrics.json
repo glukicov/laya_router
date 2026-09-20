@@ -659,5 +659,19 @@
     "cost_usd_per_1k": 0.5780805555555556,
     "input_tokens": 63122,
     "output_tokens": 252246
+  },
+  "paired": {
+    "n": 180,
+    "same_answer": 96,
+    "both_right": 70,
+    "only_a_right": 38,
+    "only_b_right": 38,
+    "both_wrong": 34,
+    "accuracy_difference": 0.0,
+    "difference_95ci": [
+      -0.09492713254821912,
+      0.09492713254821912
+    ],
+    "mcnemar_exact_p": 1.0
   }
 }

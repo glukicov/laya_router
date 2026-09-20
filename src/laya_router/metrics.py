@@ -128,6 +128,58 @@ def deferral_curve(confidences: Sequence[float], correct: Sequence[bool], steps:
     return curve
 
 
+def paired_comparison(
+    rows_a: list[dict[str, Any]], rows_b: list[dict[str, Any]], requests: Sequence[Request], qid: str = ROUTE_ID
+) -> dict[str, Any]:
+    """Compare two routers request by request, rather than by their headline averages.
+
+    Two routers can land on the same accuracy while agreeing on barely half the requests, and an average
+    cannot tell you which happened. Pairing the runs gives the only numbers that can: how often they
+    actually agree, how the wins split, and how wide the uncertainty on the difference is.
+
+    Reports McNemar's exact test on the discordant pairs, which is the right test here because both routers
+    answered the same requests, and a normal-approximation interval on the paired difference.
+    """
+    a = {row["id"]: row[f"{qid}_answer"] for row in rows_a}
+    b = {row["id"]: row[f"{qid}_answer"] for row in rows_b}
+    shared = [r for r in requests if r.id in a and r.id in b]
+    if not shared:
+        raise ValueError("the two runs share no request ids")
+
+    gold = {r.id: r.labels[qid] for r in shared}
+    both_right = sum(a[r.id] == gold[r.id] and b[r.id] == gold[r.id] for r in shared)
+    only_a = sum(a[r.id] == gold[r.id] and b[r.id] != gold[r.id] for r in shared)
+    only_b = sum(a[r.id] != gold[r.id] and b[r.id] == gold[r.id] for r in shared)
+    both_wrong = len(shared) - both_right - only_a - only_b
+
+    n = len(shared)
+    discordant = only_a + only_b
+    difference = (only_a - only_b) / n
+    # Standard error of the paired difference depends only on the discordant pairs.
+    half_width = 1.96 * math.sqrt(discordant) / n if discordant else 0.0
+
+    return {
+        "n": n,
+        "same_answer": sum(a[r.id] == b[r.id] for r in shared),
+        "both_right": both_right,
+        "only_a_right": only_a,
+        "only_b_right": only_b,
+        "both_wrong": both_wrong,
+        "accuracy_difference": difference,
+        "difference_95ci": [difference - half_width, difference + half_width],
+        "mcnemar_exact_p": _mcnemar_exact_p(only_a, only_b),
+    }
+
+
+def _mcnemar_exact_p(b: int, c: int) -> float:
+    """Two-sided exact McNemar p-value: a sign test on the discordant pairs."""
+    n = b + c
+    if n == 0:
+        return 1.0
+    tail = sum(math.comb(n, k) for k in range(min(b, c) + 1)) * 0.5**n
+    return min(1.0, 2 * tail)
+
+
 def score(rows: list[dict[str, Any]], requests: Sequence[Request]) -> dict[str, Any]:
     """Every published number for one backend's run over the labelled set.
 

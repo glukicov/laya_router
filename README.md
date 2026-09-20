@@ -44,9 +44,10 @@ reasoning model, a burst of System 2 deliberation on the critical path of every 
 | **Laya 421M, local** | **0.600** | 10.6% | 29.4% | **0.093** | **184 ms** | **$0.00** |
 | **GPT-5 nano** | **0.600** | 3.9% | 36.1% | 0.172 | 6,415 ms | $0.58 |
 
-- 🤝 **The routing accuracy is a tie**, at 35× the latency and $0.58 per thousand. GPT-5 nano spent
-  **252,246 output tokens** — roughly 1,400 per decision — deliberating over which of three tiers to use.
-  Laya generated **zero**: System 2 effort spent on a System 1 problem.
+- 🤝 **The routing accuracy is a tie** — and not because they agree: they disagree on **84 of 180**
+  requests, with the wins splitting 38–38 (McNemar p = 1.00). GPT-5 nano spent **252,246 output tokens**,
+  ~1,400 per decision, deliberating over which of three tiers to use. Laya generated **zero**: System 2
+  effort spent on a System 1 problem.
 - 🪞 **They tie on the total and fail in mirror images.** Laya is a two-tier router wearing three tiers — 97%
   of `small` right, but only 7 of 56 `medium`. Nano collapses into the middle, sending **41 of 61 `powerful`
   requests to `medium`**. Its low overspend is not frugality, it is under-provisioning.
@@ -116,6 +117,6 @@ k8s/kind/          one replica, one resident model, weights mounted from the hos
 ## Caveats
 
 180 hand-written requests on one laptop, zero-shot on both sides, no domain calibration. An independent model
-disagrees with about a quarter of the gold labels, so the ceiling is well below 1.0 and the tie at 0.600 means
-"no measurable difference", not an exact equality. Differences under ~7 points are noise. The full list is in
-[docs/EVAL.md](docs/EVAL.md#limitations).
+disagrees with about a quarter of the gold labels, so the ceiling is well below 1.0. The tie at 0.600 means
+"no measurable difference" — the two routers actually disagree on **84 of the 180 requests**, and the 95%
+interval on the paired difference is ±9.5 points. The full list is in [docs/EVAL.md](docs/EVAL.md#limitations).

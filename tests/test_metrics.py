@@ -7,6 +7,7 @@ from laya_router.metrics import (
     deferral_curve,
     expected_calibration_error,
     macro_f1,
+    paired_comparison,
     percentile,
     score,
 )
@@ -70,6 +71,63 @@ def test_score_aligns_rows_to_requests_by_id_not_order() -> None:
     assert summary["exact_match"] == 1.0
     assert summary["by_difficulty"]["terse"]["n"] == 1
     assert summary["cost_usd_per_1k"] == 1.0
+
+
+def test_paired_comparison_separates_a_tie_from_agreement() -> None:
+    """Two routers can share an accuracy while agreeing on almost nothing, which is what happened here."""
+    requests = [
+        Request(
+            id=str(i),
+            message="m",
+            difficulty="clear",
+            labels={"tier": "small", "needs_tools": "false", "is_sensitive": "false"},
+        )
+        for i in range(4)
+    ]
+    # Each is right twice, but they are never right about the same request.
+    a = [
+        _row("0", "small", "false", "false"),
+        _row("1", "small", "false", "false"),
+        _row("2", "powerful", "false", "false"),
+        _row("3", "powerful", "false", "false"),
+    ]
+    b = [
+        _row("0", "medium", "false", "false"),
+        _row("1", "medium", "false", "false"),
+        _row("2", "small", "false", "false"),
+        _row("3", "small", "false", "false"),
+    ]
+
+    paired = paired_comparison(a, b, requests)
+
+    assert paired["both_right"] == 0
+    assert paired["only_a_right"] == 2
+    assert paired["only_b_right"] == 2
+    assert paired["same_answer"] == 0
+    # Equal wins either way means no evidence of a difference, however few requests there are.
+    assert paired["accuracy_difference"] == 0.0
+    assert paired["mcnemar_exact_p"] == 1.0
+
+
+def test_paired_comparison_detects_a_one_sided_difference() -> None:
+    requests = [
+        Request(
+            id=str(i),
+            message="m",
+            difficulty="clear",
+            labels={"tier": "small", "needs_tools": "false", "is_sensitive": "false"},
+        )
+        for i in range(4)
+    ]
+    a = [_row(str(i), "small", "false", "false") for i in range(4)]
+    b = [_row(str(i), "powerful", "false", "false") for i in range(4)]
+
+    paired = paired_comparison(a, b, requests)
+
+    assert paired["only_a_right"] == 4
+    assert paired["accuracy_difference"] == 1.0
+    # Four discordant pairs all pointing one way: 2 * 0.5**4 = 0.125.
+    assert paired["mcnemar_exact_p"] == pytest_approx(0.125, 1e-9)
 
 
 def _row(request_id: str, tier: str, needs_tools: str, is_sensitive: str) -> dict[str, object]:

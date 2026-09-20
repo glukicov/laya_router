@@ -11,7 +11,7 @@ import typer
 from laya_router.backends.base import BackendName
 from laya_router.data import DATASET, load_requests, read_jsonl
 from laya_router.evaluate import RESULTS, agreement, label_blind, run
-from laya_router.metrics import score
+from laya_router.metrics import paired_comparison, score
 from laya_router.questions import ROUTE_ID
 
 app = typer.Typer(add_completion=False, help="One routing job, two brains: Laya against an OpenAI classifier.")
@@ -127,9 +127,16 @@ def eval_report(
     if not summaries:
         raise typer.BadParameter(f"no laya.jsonl or openai.jsonl found in {results}")
 
+    if {"laya", "openai"} <= set(summaries):
+        summaries["paired"] = paired_comparison(
+            list(read_jsonl(results / "laya.jsonl")), list(read_jsonl(results / "openai.jsonl")), requests
+        )
+
     destination = results / "metrics.json"
     destination.write_text(json.dumps(summaries, indent=2) + "\n", encoding="utf-8")
     typer.echo(_summary_table(summaries))
+    if "paired" in summaries:
+        typer.echo("\n" + _paired_lines(summaries["paired"]))
     typer.echo(str(destination), err=True)
 
 
@@ -209,7 +216,10 @@ def _summary_table(summaries: dict[str, dict[str, Any]]) -> str:
         "| needs_tools | is_sensitive | ECE | p50 ms | $/1k |"
     )
     lines = [header, "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
+    # `summaries` also carries the paired comparison, which is not a row in this table.
     for name, s in summaries.items():
+        if "questions" not in s:
+            continue
         route = s["questions"][ROUTE_ID]
         lines.append(
             f"| {name} | {s['model']} | {route['accuracy']:.3f} | {route['macro_f1']:.3f} "
@@ -219,6 +229,24 @@ def _summary_table(summaries: dict[str, dict[str, Any]]) -> str:
             f"| {s['overall_ece']:.3f} | {s['latency_ms']['p50']:.0f} | ${s['cost_usd_per_1k']:.2f} |"
         )
     return "\n".join(lines)
+
+
+def _paired_lines(paired: dict[str, Any]) -> str:
+    """Say request by request what the headline averages cannot."""
+    n = paired["n"]
+    low, high = paired["difference_95ci"]
+    return "\n".join(
+        [
+            f"Paired on the same {n} requests (laya vs openai):",
+            f"  same answer      {paired['same_answer']}/{n} ({paired['same_answer'] / n:.1%})",
+            f"  both right       {paired['both_right']}",
+            f"  only laya right  {paired['only_a_right']}",
+            f"  only openai right {paired['only_b_right']}",
+            f"  both wrong       {paired['both_wrong']}",
+            f"  difference       {paired['accuracy_difference'] * 100:+.1f} pts"
+            f"  (95% CI {low * 100:+.1f} to {high * 100:+.1f}), McNemar p = {paired['mcnemar_exact_p']:.3f}",
+        ]
+    )
 
 
 def main() -> None:

@@ -48,6 +48,29 @@ and the two routers would stop being comparable.
 **The routing accuracy is a tie.** Both put 60% of the 180 requests in the right tier. The 421M model does it
 in 184 ms on a laptop for nothing; the hosted model takes **6.4 seconds** and **$0.58 per thousand routes**.
 
+### An exact tie deserves suspicion, so here is the paired breakdown
+
+Two routers landing on precisely 108/180 looks like a copied file. It is not: they **disagree on 84 of the
+180 requests**, agreeing only 53% of the time.
+
+| | count |
+|---|---:|
+| both right | 70 |
+| only Laya right | **38** |
+| only GPT-5 nano right | **38** |
+| both wrong | 34 |
+
+The tie is an artefact of those 76 decisive cases splitting exactly evenly. If the two routers were genuinely
+equally good, an exact 38–38 split happens about 9% of the time — a coincidence, not a bug, and not evidence
+that they behave alike.
+
+What the pairing does establish is that there is no difference to find here. McNemar's test on the discordant
+pairs gives **p = 1.00**, and the 95% confidence interval on the paired accuracy difference is **0.0 ± 9.5
+percentage points**. At n=180, any gap smaller than about 9.5 points — in either direction — is
+indistinguishable from a tie. Each router's own accuracy carries its own interval too: 0.600 ± 0.072.
+
+Read the headline as "no measurable difference in routing accuracy", never as "the same answers".
+
 The latency is not a fluke of a slow endpoint. GPT-5 nano is a reasoning model, and it spent **252,246 output
 tokens** across 180 routing decisions — about 1,400 tokens of deliberation to answer "which of these three".
 Laya produced **zero**, because there is no text to produce. That is the System 1 / System 2 split showing up
@@ -212,9 +235,9 @@ Even at 927 ms in a container on the wrong platform, the local router is still 7
 
 ## Limitations
 
-- **180 requests.** Differences smaller than about 7 points are inside the noise, and the per-difficulty
-  buckets (n=9 to n=118) are smaller still. The tie at 0.600 should be read as "no measurable difference",
-  not as an exact equality.
+- **180 requests.** The 95% interval on a paired accuracy difference is ±9.5 points, so treat anything
+  smaller as noise; the per-difficulty buckets (n=9 to n=118) are weaker still. The tie at 0.600 means "no
+  measurable difference", not an exact equality — the two routers disagree on 84 of the 180 requests.
 - **The requests are written, not collected**, by one annotator, and a strong independent model disagrees with
   about a quarter of the labels. See the audit above and [`data/README.md`](../data/README.md).
 - **The tier policy is a judgement call.** "Cheapest tier that can do it well" is a policy, not a fact. This
@@ -238,7 +261,7 @@ Even at 927 ms in a container on the wrong platform, the local router is still 7
 uv sync --all-extras
 uv run laya-router eval run --backend laya --device mps    # results/laya.jsonl
 uv run laya-router eval run --backend openai               # results/openai.jsonl, needs OPENAI_API_KEY
-uv run laya-router eval report                             # results/metrics.json + the table above
+uv run laya-router eval report                             # the table above + the paired breakdown
 uv run laya-router figures                                 # docs/figures/*.png
 uv run laya-router eval ablate --device mps                # results/ablation.json + the ablation figure
 uv run laya-router eval adjudicate                         # results/adjudication.jsonl
