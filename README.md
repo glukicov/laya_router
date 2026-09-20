@@ -91,13 +91,19 @@ uv run laya-router eval ablate     # the wording experiment
 uv run laya-router figures
 ```
 
-On Kubernetes (local, CPU-only — a Linux container on macOS cannot reach Apple's MPS backend, so expect
-927 ms rather than 184 ms):
+On Kubernetes, locally:
 
 ```bash
 k8s/kind/up.sh      # builds the image, creates the cluster, serves on localhost:8080
 k8s/kind/down.sh
 ```
+
+This is a packaging proof, not a scaling story: one replica, non-root, readiness gated on the model being
+warm, weights mounted from the host cache rather than baked into the image. It earns its place for one
+measurement — the same model answers in **927 ms** in the container against **184 ms** natively, because a
+Linux container on macOS cannot reach Apple's MPS backend. That is a virtualisation cost, not a Kubernetes
+one, and it would not appear on a Linux host. For autoscaling, GPUs and load behaviour, see
+[ltm_serve](https://github.com/glukicov/ltm_serve), which is about exactly that.
 
 ## Layout
 
