@@ -14,7 +14,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![kind](https://img.shields.io/badge/Kubernetes-kind-326CE5?logo=kubernetes&logoColor=white)](https://kind.sigs.k8s.io)
 
-**[Result](#result) · [Quickstart](#quickstart) · [The experiment](docs/EVAL.md) · [The data](data/README.md)**
+**[Read the accompanying article on Medium](https://medium.com/@lukicov/smart-routing-with-an-open-source-system-1-model-laya-416fe771ce2e) · [Result](#result) · [Quickstart](#quickstart) · [The experiment](docs/EVAL.md) · [The data](data/README.md)**
 
 </div>
 
