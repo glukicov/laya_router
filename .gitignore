@@ -15,5 +15,9 @@ wheels/
 # Secrets
 .env
 
+# Unpublished write-ups and social cards: drafted here, published elsewhere.
+# Figures that the README and docs/EVAL.md reference live in docs/figures and are tracked.
+drafts/
+
 # macOS
 .DS_Store

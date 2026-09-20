@@ -38,7 +38,7 @@ and the two routers would stop being comparable.
 
 ## The result
 
-![hero](../drafts/hero.png)
+![hero](figures/hero.png)
 
 | | route accuracy | macro F1 | too expensive | too weak | `needs_tools` | `is_sensitive` | ECE | p50 | p99 | per 1,000 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|

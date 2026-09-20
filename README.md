@@ -35,7 +35,7 @@ all three routing questions in **one forward pass** as probabilities, generating
 **GPT-5 nano** is the way most routers are built today: a prompt, a JSON schema, a network call — and, as a
 reasoning model, a burst of System 2 deliberation on the critical path of every request.
 
-![hero](drafts/hero.png)
+![hero](docs/figures/hero.png)
 
 ## Result
 

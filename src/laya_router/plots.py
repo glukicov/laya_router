@@ -193,6 +193,80 @@ def difficulty(summaries: dict[str, dict[str, Any]]) -> Path:
     return _save(fig, "difficulty.png")
 
 
+def hero(summaries: dict[str, dict[str, Any]]) -> Path:
+    """The headline picture: what each router costs to make one decision, and what that buys.
+
+    A router runs on every request, so its latency and price are pure overhead on top of the model that
+    actually answers. That is the axis worth plotting, and both numbers come straight from the scored runs.
+    """
+    style = {
+        "laya": ("Laya 421M\non the laptop", BLUE, (0, -86), "center"),
+        "openai": ("GPT-5 nano\nover the network", ORANGE, (-16, 58), "right"),
+    }
+
+    fig, ax = plt.subplots(figsize=(8.6, 6.3))
+    points: dict[str, tuple[float, float]] = {}
+    for name, (label, colour, offset, align) in style.items():
+        if name not in summaries:
+            continue
+        summary = summaries[name]
+        x = summary["latency_ms"]["p50"]
+        y = summary["questions"][ROUTE_ID]["accuracy"]
+        points[name] = (x, y)
+        ax.scatter([x], [y], s=560, color=colour, zorder=3, edgecolor=SURFACE, linewidth=3)
+        cost = summary["cost_usd_per_1k"]
+        money = "free" if cost == 0 else f"${cost:,.2f} per 1,000"
+        ax.annotate(
+            f"{label}\n{x:,.0f} ms  ·  {money}",
+            (x, y),
+            xytext=offset,
+            textcoords="offset points",
+            ha=align,
+            color=INK,
+            fontsize=13,
+            linespacing=1.35,
+        )
+
+    if len(points) == 2:
+        (x0, y0), (x1, y1) = points["laya"], points["openai"]
+        ax.annotate(
+            "",
+            xy=(x1, y1),
+            xytext=(x0, y0),
+            arrowprops={"arrowstyle": "-", "color": INK_2, "linewidth": 1.2, "linestyle": (0, (4, 3))},
+        )
+        gap = (y1 - y0) * 100
+        # A 0.0-point gap is the finding, but "+0.0 points" reads like a rounding artefact.
+        verdict = "for no measurable gain" if abs(gap) < 0.5 else f"for {gap:+.1f} points"
+        ax.text(
+            (x0 * x1) ** 0.5,
+            (y0 + y1) / 2 - 0.028,
+            f"{x1 / x0:,.0f}× the latency, {verdict}",
+            color=INK_2,
+            fontsize=12.5,
+            ha="center",
+        )
+
+    ax.set_xscale("log")
+    ax.set_xlim(85, 26_000)
+    ax.set_ylim(0.50, 0.74)
+    ax.set_xticks([100, 300, 1_000, 3_000, 10_000], ["100", "300", "1,000", "3,000", "10,000"])
+    ax.set_xlabel("time to make one routing decision (ms, log scale)")
+    ax.set_ylabel("requests routed to the right tier")
+    ax.set_title("A router runs on every request", fontsize=17, loc="left", pad=28)
+    ax.text(
+        0.0,
+        1.02,
+        "180 labelled requests routed to small, medium or powerful",
+        transform=ax.transAxes,
+        color=INK_2,
+        fontsize=11,
+        va="bottom",
+    )
+    ax.grid(axis="x", visible=False)
+    return _save(fig, "hero.png")
+
+
 def routing_errors(summaries: dict[str, dict[str, Any]]) -> Path:
     """Where each router's mistakes go: too expensive, or too weak.
 
@@ -329,6 +403,7 @@ def render_all(metrics_path: Path) -> list[Path]:
     summaries = json.loads(metrics_path.read_text(encoding="utf-8"))
     ordered = {name: summaries[name] for name in ("laya", "openai") if name in summaries}
     figures = [
+        hero(ordered),
         routing_errors(ordered),
         tier_share(ordered),
         accuracy(ordered),
