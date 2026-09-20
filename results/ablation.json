@@ -1,0 +1,35 @@
+[
+  {
+    "variant": "shipped",
+    "options": 6,
+    "n": 150,
+    "accuracy": 0.6733333333333333,
+    "macro_f1": 0.6634969818683603,
+    "other_rate": 0.31333333333333335,
+    "n_common": 130,
+    "accuracy_common": 0.6384615384615384,
+    "macro_f1_common": 0.6937772144603265
+  },
+  {
+    "variant": "sharpened",
+    "options": 6,
+    "n": 150,
+    "accuracy": 0.6466666666666666,
+    "macro_f1": 0.6332726931664822,
+    "other_rate": 0.3,
+    "n_common": 130,
+    "accuracy_common": 0.6153846153846154,
+    "macro_f1_common": 0.6615256002912705
+  },
+  {
+    "variant": "no-catch-all",
+    "options": 5,
+    "n": 130,
+    "accuracy": 0.7153846153846154,
+    "macro_f1": 0.7071088142405972,
+    "other_rate": 0.0,
+    "n_common": 130,
+    "accuracy_common": 0.7153846153846154,
+    "macro_f1_common": 0.7071088142405972
+  }
+]

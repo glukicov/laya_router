@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Nothing here writes to the repository.
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Lint, types and tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: true
+
+      # uv reads .python-version. The runner never downloads a checkpoint or calls an API: every test
+      # runs against the fakes in tests/fakes.py.
+      - name: Install the project with CPU-only PyTorch
+        run: |
+          locked=$(uv export --locked --all-extras --no-emit-project --no-hashes)
+          skip=()
+          while read -r package; do
+            skip+=(--no-install-package "$package")
+          done < <(grep -oE '^(torch|triton|nvidia-[a-z0-9-]+|cuda-[a-z0-9-]+)==' <<<"$locked" | sed 's/==$//')
+          uv sync --locked --all-extras "${skip[@]}"
+          uv pip install --torch-backend cpu "$(grep -oE '^torch==[^ ;]+' <<<"$locked")"
+
+      - name: Lint
+        run: uv run --no-sync ruff check --output-format github .
+
+      - name: Format
+        run: uv run --no-sync ruff format --check .
+
+      - name: Shellcheck
+        run: git ls-files -z '*.sh' | xargs -0 shellcheck
+
+      - name: Types
+        run: uv run --no-sync ty check
+
+      - name: Tests
+        run: uv run --no-sync pytest -q

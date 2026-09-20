@@ -1,0 +1,16 @@
+# Local cluster for the Kubernetes phase. The host's Hugging Face cache is mounted into the node so the pod reads
+# the 843 MB checkpoint through a hostPath volume instead of downloading it on every pod start.
+# Rendered by k8s/kind/up.sh, which fills HF_CACHE_DIR.
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+name: laya
+nodes:
+  - role: control-plane
+    extraMounts:
+      - hostPath: ${HF_CACHE_DIR}
+        containerPath: /models
+        readOnly: true
+    extraPortMappings:
+      - containerPort: 30080
+        hostPort: 8080
+        protocol: TCP

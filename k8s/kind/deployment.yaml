@@ -1,0 +1,101 @@
+# One replica, one resident model. A second replica would load another copy of the checkpoint for no gain on a
+# single-node local cluster, which is the same reason the native server runs one worker.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: laya
+---
+# The host's Hugging Face cache, mounted read-only. Nothing in the pod writes to it.
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: laya-weights
+spec:
+  capacity:
+    storage: 20Gi
+  accessModes: [ReadOnlyMany]
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: manual
+  hostPath:
+    path: /models
+    type: Directory
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: laya-weights
+  namespace: laya
+spec:
+  accessModes: [ReadOnlyMany]
+  storageClassName: manual
+  volumeName: laya-weights
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: laya-router
+  namespace: laya
+spec:
+  replicas: 1
+  strategy:
+    # Recreate, not RollingUpdate: with one read-only weights volume and one model, starting the new pod before
+    # stopping the old one only doubles the memory for no benefit.
+    type: Recreate
+  selector:
+    matchLabels: { app: laya-router }
+  template:
+    metadata:
+      labels: { app: laya-router }
+    spec:
+      containers:
+        - name: service
+          image: laya-router:cpu
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: HF_HOME
+              value: /models
+          volumeMounts:
+            - name: weights
+              mountPath: /models
+              readOnly: true
+          # Readiness is gated on /health, which the app only serves once the model is loaded AND warm. Liveness
+          # is deliberately slower and more forgiving: a cold CPU start takes a while and must not be restarted
+          # halfway through.
+          readinessProbe:
+            httpGet: { path: /health, port: 8080 }
+            periodSeconds: 5
+            failureThreshold: 60
+          livenessProbe:
+            httpGet: { path: /health, port: 8080 }
+            initialDelaySeconds: 300
+            periodSeconds: 30
+            failureThreshold: 5
+          resources:
+            requests: { cpu: "1", memory: 3Gi }
+            limits: { memory: 6Gi }
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            capabilities: { drop: ["ALL"] }
+      volumes:
+        - name: weights
+          persistentVolumeClaim:
+            claimName: laya-weights
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: laya-router
+  namespace: laya
+spec:
+  type: NodePort
+  selector: { app: laya-router }
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30080
