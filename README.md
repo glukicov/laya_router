@@ -22,10 +22,18 @@
 whether a `small`, `medium` or `powerful` model should answer, then the work goes there. That decision is on
 the critical path of every single request, so the router's own latency and bill are pure overhead.
 
+Which makes routing a **System 1** job. In Daniel Kahneman's
+[*Thinking, Fast and Slow*](https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow), System 1 is fast,
+automatic and intuitive; System 2 is slow, deliberate and effortful. Deciding *which model should answer
+this* is a reflex, not a deliberation — you want the snap judgement, and you want it before the real work
+starts.
+
 This repo puts two routers behind one endpoint and measures them on 180 labelled requests.
-[**Laya**](https://huggingface.co/convaiinnovations/laya) is a 421M non-autoregressive decision model running
-on a laptop: it answers all three routing questions in **one forward pass** as probabilities, generating no
-text at all. **GPT-5 nano** is the way most routers are built today — a prompt, a JSON schema, a network call.
+[**Laya**](https://huggingface.co/convaiinnovations/laya) is a 421M non-autoregressive decision model that
+describes itself as a *System 1 decision engine* — its API method is literally `system_one()`. It answers
+all three routing questions in **one forward pass** as probabilities, generating no text at all.
+**GPT-5 nano** is the way most routers are built today: a prompt, a JSON schema, a network call — and, as a
+reasoning model, a burst of System 2 deliberation on the critical path of every request.
 
 ![hero](drafts/hero.png)
 
@@ -36,8 +44,9 @@ text at all. **GPT-5 nano** is the way most routers are built today — a prompt
 | **Laya 421M, local** | **0.600** | 10.6% | 29.4% | **0.093** | **184 ms** | **$0.00** |
 | **GPT-5 nano** | **0.600** | 3.9% | 36.1% | 0.172 | 6,415 ms | $0.58 |
 
-- 🤝 **The routing accuracy is a tie**, at 35× the latency and $0.58 per thousand. GPT-5 nano is a reasoning
-  model: it spent **252,246 output tokens** deciding which of three tiers to use. Laya generated **zero**.
+- 🤝 **The routing accuracy is a tie**, at 35× the latency and $0.58 per thousand. GPT-5 nano spent
+  **252,246 output tokens** — roughly 1,400 per decision — deliberating over which of three tiers to use.
+  Laya generated **zero**: System 2 effort spent on a System 1 problem.
 - 🪞 **They tie on the total and fail in mirror images.** Laya is a two-tier router wearing three tiers — 97%
   of `small` right, but only 7 of 56 `medium`. Nano collapses into the middle, sending **41 of 61 `powerful`
   requests to `medium`**. Its low overspend is not frugality, it is under-provisioning.

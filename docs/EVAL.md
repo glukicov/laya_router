@@ -4,13 +4,19 @@ A router sits in front of a fleet of models and decides, per request, which tier
 routine work, `medium` for general analysis, `powerful` for genuinely hard or high-stakes requests. It runs on
 **every** request, so its own latency and cost are pure overhead on top of the model that does the work.
 
+That makes routing a **System 1** job. In Kahneman's *Thinking, Fast and Slow*, System 1 is the fast,
+automatic, intuitive mode and System 2 is the slow, deliberate, effortful one. "Which model should answer
+this?" wants the snap judgement — and it wants it before any of the real work begins.
+
 That is what makes a 421M encoder an interesting thing to put there — and what this experiment measures.
 
 - **Laya.** `convaiinnovations/laya`, 421M parameters, a ModernBERT-large encoder with a typed decision head.
-  Not generative: all three questions are answered in **one forward pass** as probabilities over the options.
+  The SDK describes it as a *System 1 decision engine* and the method is called `system_one()`. Not
+  generative: all three questions are answered in **one forward pass** as probabilities over the options.
   No tokens produced, nothing to parse.
 - **GPT-5 nano.** The same three questions, given as a prompt with a strict JSON schema, plus a request for
-  its own confidence. This is how most routers are built today.
+  its own confidence. This is how most routers are built today — and, being a reasoning model, it brings
+  System 2 to the job whether or not the job wants it.
 - **Same contract.** Both return the identical object (`src/laya_router/schema.py`). The OpenAI prompt and its
   JSON schema are *generated from* the question dictionary Laya consumes (`src/laya_router/questions.py`), so
   neither side is given wording the other did not.
@@ -43,8 +49,9 @@ and the two routers would stop being comparable.
 in 184 ms on a laptop for nothing; the hosted model takes **6.4 seconds** and **$0.58 per thousand routes**.
 
 The latency is not a fluke of a slow endpoint. GPT-5 nano is a reasoning model, and it spent **252,246 output
-tokens** across 180 routing decisions — about 1,400 tokens of thinking to answer "which of these three". Laya
-produced **zero** output tokens, because there is no text to produce.
+tokens** across 180 routing decisions — about 1,400 tokens of deliberation to answer "which of these three".
+Laya produced **zero**, because there is no text to produce. That is the System 1 / System 2 split showing up
+as an invoice: one model reaches for an intuition, the other reasons its way to the same answer.
 
 ![cost and latency](figures/cost_latency.png)
 
