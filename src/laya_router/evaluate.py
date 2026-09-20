@@ -47,53 +47,77 @@ def run(
     return rows
 
 
-ADJUDICATION_PROMPT = (
-    "You are auditing the gold labels of a support-triage dataset. For the message below, decide "
-    "whether the proposed labels are defensible. Answer `agree` unless a label is clearly wrong; "
-    "borderline cases count as agreement. If you disagree, say which label and what it should be."
+BLIND_PROMPT = (
+    "You are labelling a dataset of user requests for a model router. For the request below, answer every "
+    "question from scratch. You are not shown anyone else's answers; give your own."
 )
 
 
-def adjudicate(
+def label_blind(
     client: Any, requests: Sequence[Request], model: str, out_path: Path | None = None
 ) -> list[dict[str, Any]]:
-    """Ask a strong, independent model whether each gold label is defensible.
+    """Have a strong, independent model label the set from scratch, never seeing the gold labels.
 
-    The labels here were written by one person, which is a real weakness of a hand-authored set.
-    This does not fix that, but it does surface the items where a capable reader would disagree, so
-    the write-up can report how many there are instead of claiming the labels are obviously right.
+    This replaces an earlier design that showed the model the proposed labels and asked whether it agreed.
+    That design does not measure what it looks like it measures: run it twice, either side of a relabelling,
+    and the same model objects to whichever label it is shown, in whichever direction. Anchoring on the
+    presented answer makes the resulting "agreement rate" meaningless.
+
+    Labelling blind and comparing afterwards is the ordinary way to measure inter-annotator agreement, and it
+    is the number this project reports.
     """
-    from laya_router.questions import render_for_prompt
+    from laya_router.questions import QUESTIONS, TIERS, render_for_prompt
 
     schema = {
         "type": "object",
         "properties": {
-            "verdict": {"type": "string", "enum": ["agree", "disagree"]},
-            "field": {"type": "string", "enum": [*QUESTION_IDS, "none"]},
-            "suggested": {"type": "string"},
-            "reason": {"type": "string"},
+            "tier": {"type": "string", "enum": list(TIERS)},
+            **{qid: {"type": "boolean"} for qid in QUESTIONS if qid != "tier"},
         },
-        "required": ["verdict", "field", "suggested", "reason"],
+        "required": list(QUESTIONS),
         "additionalProperties": False,
     }
 
     rows: list[dict[str, Any]] = []
     for request in requests:
-        proposed = json.dumps(request.labels, ensure_ascii=False)
         response = client.chat.completions.create(
             model=model,
             messages=[
-                {"role": "system", "content": f"{ADJUDICATION_PROMPT}\n\n{render_for_prompt()}"},
-                {"role": "user", "content": f"message: {request.message}\nproposed labels: {proposed}"},
+                {"role": "system", "content": f"{BLIND_PROMPT}\n\n{render_for_prompt()}"},
+                {"role": "user", "content": request.message},
             ],
             response_format={
                 "type": "json_schema",
-                "json_schema": {"name": "adjudication", "strict": True, "schema": schema},
+                "json_schema": {"name": "labels", "strict": True, "schema": schema},
             },
         )
-        verdict = json.loads(response.choices[0].message.content or "{}")
-        rows.append({"id": request.id, "message": request.message, **request.labels, **verdict})
+        proposed = json.loads(response.choices[0].message.content or "{}")
+        theirs = {
+            qid: (str(proposed[qid]).lower() if isinstance(proposed[qid], bool) else str(proposed[qid]))
+            for qid in QUESTIONS
+            if qid in proposed
+        }
+        rows.append(
+            {
+                "id": request.id,
+                "message": request.message,
+                **{f"{qid}_mine": value for qid, value in request.labels.items()},
+                **{f"{qid}_theirs": value for qid, value in theirs.items()},
+                "agree": all(theirs.get(qid) == value for qid, value in request.labels.items()),
+            }
+        )
 
     if out_path is not None:
         write_jsonl(out_path, rows)
     return rows
+
+
+def agreement(rows: Sequence[dict[str, Any]]) -> dict[str, float]:
+    """Per-question agreement between the gold labels and an independent blind pass."""
+    out: dict[str, float] = {}
+    for qid in QUESTION_IDS:
+        pairs = [(r[f"{qid}_mine"], r.get(f"{qid}_theirs")) for r in rows if f"{qid}_theirs" in r]
+        if pairs:
+            out[qid] = sum(mine == theirs for mine, theirs in pairs) / len(pairs)
+    out["all_three"] = sum(bool(r["agree"]) for r in rows) / len(rows) if rows else 0.0
+    return out

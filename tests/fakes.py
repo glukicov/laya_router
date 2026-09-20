@@ -1,14 +1,16 @@
 """Test doubles shared by the suite.
 
-Nothing here touches the network or loads a real checkpoint: the point of the backend protocol is
-that everything above it can be tested without either.
+Nothing here touches the network or loads a real checkpoint: the point of the backend protocol is that
+everything above it can be tested without either.
 """
 
 from typing import Any
 
 from laya_router.backends.base import BackendName
-from laya_router.questions import BOOLEAN_IDS, QUEUES
+from laya_router.questions import BOOLEAN_IDS, TIERS
 from laya_router.schema import Decision, TriageResult
+
+DEFAULT_ROUTE = {"tier": "medium", "needs_tools": "false", "is_sensitive": "true"}
 
 
 class FakeBackend:
@@ -32,12 +34,12 @@ class FakeBackend:
 
     def classify(self, message: str) -> TriageResult:
         self.seen.append(message)
-        chosen = self.answers.get(message, {"queue": "billing", "urgent": "false", "needs_human": "true"})
+        chosen = self.answers.get(message, DEFAULT_ROUTE)
         decisions = {
-            "queue": Decision(
-                answer=chosen["queue"],
+            "tier": Decision(
+                answer=chosen["tier"],
                 confidence=0.9,
-                probabilities={name: (0.9 if name == chosen["queue"] else 0.02) for name in QUEUES},
+                probabilities={name: (0.9 if name == chosen["tier"] else 0.05) for name in TIERS},
             )
         }
         for qid in BOOLEAN_IDS:

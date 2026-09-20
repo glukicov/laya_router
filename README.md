@@ -1,6 +1,6 @@
 <div align="center">
 
-<h2>A 421M model answers your triage questions in one forward pass. Do you still need an LLM for it?</h2>
+<h2>Your model router runs on every request. Does it need to be a language model?</h2>
 
 [![CI](https://github.com/glukicov/laya_router/actions/workflows/ci.yml/badge.svg)](https://github.com/glukicov/laya_router/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/License-Apache--2.0-blue.svg)](LICENSE)
@@ -10,25 +10,46 @@
 [![ty](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ty/main/assets/badge/v0.json)](https://github.com/astral-sh/ty)
 <br>
 [![Laya](https://img.shields.io/badge/%F0%9F%A4%97%20Model-convaiinnovations%2Flaya-blue)](https://huggingface.co/convaiinnovations/laya)
-[![OpenAI](https://img.shields.io/badge/OpenAI-structured%20outputs-412991?logo=openai&logoColor=white)](https://platform.openai.com/docs/guides/structured-outputs)
+[![OpenAI](https://img.shields.io/badge/OpenAI-gpt--5--nano-412991?logo=openai&logoColor=white)](https://platform.openai.com/docs/guides/structured-outputs)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
 [![kind](https://img.shields.io/badge/Kubernetes-kind-326CE5?logo=kubernetes&logoColor=white)](https://kind.sigs.k8s.io)
 
-**[Results](#results) · [Quickstart](#quickstart) · [The experiment](docs/EVAL.md) · [The data](data/README.md)**
+**[Result](#result) · [Quickstart](#quickstart) · [The experiment](docs/EVAL.md) · [The data](data/README.md)**
 
 </div>
 
-**laya_router — one triage job, two brains.** A support-triage service that turns an inbound message into three
-typed decisions (which queue, is it urgent, does a human need to handle it), answered either by
-[Laya](https://huggingface.co/convaiinnovations/laya) — a 421M non-autoregressive decision model running on your
-laptop — or by a hosted OpenAI classifier with structured outputs. Same endpoint, same response, swap the brain
-with a flag. Then a head-to-head on 150 hand-labelled messages: accuracy, calibration, latency and cost.
+**laya_router — a smart model router, with two brains.** Every request goes to the router first: it decides
+whether a `small`, `medium` or `powerful` model should answer, then the work goes there. That decision is on
+the critical path of every single request, so the router's own latency and bill are pure overhead.
 
-Laya is not generative. It answers every question in **one forward pass** as probabilities over the options, so
-there is no text to parse, nothing to hallucinate, no output tokens to pay for — and a confidence number that
-turns out to mean something.
+This repo puts two routers behind one endpoint and measures them on 180 labelled requests.
+[**Laya**](https://huggingface.co/convaiinnovations/laya) is a 421M non-autoregressive decision model running
+on a laptop: it answers all three routing questions in **one forward pass** as probabilities, generating no
+text at all. **GPT-5 nano** is the way most routers are built today — a prompt, a JSON schema, a network call.
 
-<!-- RESULTS -->
+![hero](drafts/hero.png)
+
+## Result
+
+| | route accuracy | too expensive | too weak | ECE | p50 | per 1,000 routes |
+|---|---:|---:|---:|---:|---:|---:|
+| **Laya 421M, local** | **0.600** | 10.6% | 29.4% | **0.093** | **184 ms** | **$0.00** |
+| **GPT-5 nano** | **0.600** | 3.9% | 36.1% | 0.172 | 6,415 ms | $0.58 |
+
+- 🤝 **The routing accuracy is a tie**, at 35× the latency and $0.58 per thousand. GPT-5 nano is a reasoning
+  model: it spent **252,246 output tokens** deciding which of three tiers to use. Laya generated **zero**.
+- 🪞 **They tie on the total and fail in mirror images.** Laya is a two-tier router wearing three tiers — 97%
+  of `small` right, but only 7 of 56 `medium`. Nano collapses into the middle, sending **41 of 61 `powerful`
+  requests to `medium`**. Its low overspend is not frugality, it is under-provisioning.
+- ✍️ **Three sentences beat 35× the latency.** Rewording the tier descriptions — same model, same data —
+  swings accuracy **21 points** (0.428 → 0.639). With concrete examples instead of abstract categories, the
+  421M local model's macro F1 passes GPT-5 nano's, still in under 200 ms for nothing.
+- 🔍 **The label audit needed auditing.** Showing a model the labels and asking if it agrees measures
+  anchoring, not agreement — run it twice either side of a relabelling and the verdicts invert. Labelling
+  **blind** instead puts GPT-5 at **0.817** agreement on `tier`, so the ceiling is ~0.82 and a 4-point gap
+  between routers is noise.
+
+The full study, including what it does not show, is in **[docs/EVAL.md](docs/EVAL.md)**.
 
 ## Quickstart
 
@@ -40,7 +61,7 @@ uv sync --all-extras
 uv run laya-router serve --backend laya
 
 curl -s localhost:8000/triage -H 'content-type: application/json' \
-  -d '{"message":"I was charged twice for invoice 4411. Please refund the duplicate charge."}' | python3 -m json.tool
+  -d '{"message":"Design a multi-region active-active architecture for our payments service."}' | python3 -m json.tool
 ```
 
 Swap the brain without touching the caller:
@@ -50,16 +71,18 @@ cp .env.example .env   # add your OPENAI_API_KEY
 uv run laya-router serve --backend openai
 ```
 
-Run the whole study yourself:
+Reproduce the study (the OpenAI side costs about $0.10):
 
 ```bash
 uv run laya-router eval run --backend laya --device mps
 uv run laya-router eval run --backend openai
-uv run laya-router eval report        # the comparison table
-uv run laya-router figures            # docs/figures/*.png
+uv run laya-router eval report     # the comparison table
+uv run laya-router eval ablate     # the wording experiment
+uv run laya-router figures
 ```
 
-On Kubernetes (local, CPU-only — a Linux container on macOS cannot reach Apple's MPS backend):
+On Kubernetes (local, CPU-only — a Linux container on macOS cannot reach Apple's MPS backend, so expect
+927 ms rather than 184 ms):
 
 ```bash
 k8s/kind/up.sh      # builds the image, creates the cluster, serves on localhost:8080
@@ -70,20 +93,20 @@ k8s/kind/down.sh
 
 ```
 src/laya_router/
-  questions.py     the one schema both brains answer; the OpenAI prompt and JSON schema are generated from it
+  questions.py     the one schema both routers answer; the OpenAI prompt and JSON schema are generated from it
   backends/        laya_backend.py (resident, one forward pass) · openai_backend.py (structured outputs)
   service.py       FastAPI: /triage, /health, /questions
-  evaluate.py      run a backend over the labelled set · audit the gold labels with an independent model
-  metrics.py       accuracy, macro F1, ECE, deferral curves — dependency-free, so CI scores without extras
-  ablation.py      does rewording the options change the answers?
-data/              150 labelled messages and how they were written
+  evaluate.py      run a router over the labelled set · audit the gold labels with an independent model
+  metrics.py       accuracy, macro F1, ECE, deferral, overspend vs underspend — dependency-free
+  ablation.py      how much of a router's accuracy is really its prompt?
+data/              180 labelled requests, the labelling rules, and the trap built into them
 docs/EVAL.md       the experiment: every number and what it does not show
 k8s/kind/          one replica, one resident model, weights mounted from the host cache
 ```
 
 ## Caveats
 
-150 hand-written messages on one laptop, zero-shot on both sides, with no domain calibration — Laya's model card
-asks for temperature fitting before operational use, and this evaluation deliberately skips it to measure what
-comes out of the box. Differences under ~8 points are inside the noise. The full list is in
+180 hand-written requests on one laptop, zero-shot on both sides, no domain calibration. An independent model
+disagrees with about a quarter of the gold labels, so the ceiling is well below 1.0 and the tie at 0.600 means
+"no measurable difference", not an exact equality. Differences under ~7 points are noise. The full list is in
 [docs/EVAL.md](docs/EVAL.md#limitations).

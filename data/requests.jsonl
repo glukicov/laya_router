@@ -1,150 +1,180 @@
-{"id": "bil-01", "message": "I was charged twice for invoice 4411 this morning. Please refund the duplicate charge.", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-02", "message": "Could you send me a copy of last month's invoice as a PDF?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-03", "message": "Our card on file expired. How do I update the payment method?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-04", "message": "The renewal charge hits on Friday and finance has not approved it yet. Can you pause the billing run before then?", "queue": "billing", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-05", "message": "VAT is missing from every invoice since March and our auditors have flagged it. We need corrected invoices by end of week.", "queue": "billing", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-06", "message": "refund pls", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "terse"}
-{"id": "bil-07", "message": "invoice 8821 wrong amount", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "bil-08", "message": "I am NOT asking for a refund. I just want to understand why the proration on my last invoice looks the way it does.", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "bil-09", "message": "Nothing is broken and nothing is urgent, I would simply like the billing contact on the account changed to our finance mailbox.", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "bil-10", "message": "The API started throwing 402 payment required errors an hour ago and all our jobs are failing. I assume a card declined somewhere.", "queue": "billing", "urgent": "true", "needs_human": "false", "difficulty": "mixed"}
-{"id": "bil-11", "message": "Loving the product so far. Quick admin thing though: can we move from monthly to annual billing and get the discount applied to the current term?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "bil-12", "message": "we got billled for 40 seats but we only ever had 12 active, this has been going on for 3 months now and nobody has replied to my last two emails", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "noisy"}
-{"id": "bil-13", "message": "PLEASE CANCEL MY SUBSCRIPTION AND REFUND THIS MONTH I AM DONE WITH THIS", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "noisy"}
-{"id": "bil-14", "message": "What currencies do you bill in? We are opening an entity in Japan next quarter.", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-15", "message": "Our payment failed and the account is scheduled for suspension tomorrow. We have paid by bank transfer, reference GL-9912. Please stop the suspension.", "queue": "billing", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-16", "message": "Can I get a receipt for the top-up I made on the 3rd?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-17", "message": "There is a line on the invoice called overage credits that I do not recognise. What is it?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-18", "message": "We were promised a 20 percent discount by your sales rep but the invoice shows full price. Who fixes that, you or them?", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "mixed"}
-{"id": "bil-19", "message": "Please chargeback reversal on transaction 77120, our bank has already opened a dispute.", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-20", "message": "how do i download invoices in bulk", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "bil-21", "message": "I cancelled in January and you have charged me every month since. That is five charges. I want all of them back.", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-22", "message": "Do unused credits roll over to the next billing period or do they expire?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-23", "message": "Our purchase order number needs to appear on the invoice or our AP system rejects it. Invoice 9014 is missing it and payment is due Monday.", "queue": "billing", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-24", "message": "billing", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "bil-25", "message": "I know this is probably a sales question but I could not find anyone else: what does the enterprise plan actually cost per seat once you are past 500 users, because the invoice estimate I was sent does not match the pricing page at all.", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "bil-26", "message": "Stop taking money out of my account. I did not authorise this and I will go to my bank if it happens again.", "queue": "billing", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "bil-27", "message": "Can you split our invoice across two cost centres from next month?", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-28", "message": "the tax id on our invoices is the old entity, we merged last year, need this corrected before our year end close on the 31st", "queue": "billing", "urgent": "true", "needs_human": "false", "difficulty": "noisy"}
-{"id": "bil-29", "message": "Why did my bill go up this month? Nothing changed on our side as far as I know.", "queue": "billing", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "bil-30", "message": "Refund request for the annual plan, we are within the 14 day window. Order ref 55190.", "queue": "billing", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "tec-01", "message": "The API is returning 500 errors on every call since your deploy this afternoon. Our checkout is down.", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-02", "message": "Webhooks stopped firing about two hours ago. No config changed on our side.", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-03", "message": "What is the rate limit on the search endpoint?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-04", "message": "Is there a Python SDK, or should we just call the REST API directly?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-05", "message": "Getting a CORS error when calling the API from the browser. Docs say it should be allowed.", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-06", "message": "500s everywhere", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "terse"}
-{"id": "tec-07", "message": "timeouts on /v2/export", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "tec-08", "message": "This is not urgent at all, but when you get a chance: the pagination cursor in the docs example returns a 400 if you pass it back verbatim.", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "tec-09", "message": "Nothing is down, I just want to know whether you plan to support gRPC at some point.", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "tec-10", "message": "our nightly sync has been failing silently for a week, we only noticed because finance said the numbers were wrong, logs show 429 then nothing", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "mixed"}
-{"id": "tec-11", "message": "I think we are being rate limited but our invoice says we are on the higher tier. Either the plan did not apply or the limits are wrong.", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "tec-12", "message": "PRODUCTION IS DOWN. Every request returns connection refused. Please escalate now, we are losing orders.", "queue": "technical", "urgent": "true", "needs_human": "true", "difficulty": "noisy"}
-{"id": "tec-13", "message": "hey so the thing where you click the button and it does the export, that doesnt do anything anymore, worked fine last tuesday, chrome, no errors in console that i can see", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "noisy"}
-{"id": "tec-14", "message": "Does the webhook retry with exponential backoff, and for how long?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-15", "message": "We are migrating to your v3 API next month. Is there a changelog of breaking changes?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-16", "message": "Latency on the batch endpoint went from 200ms to 4 seconds overnight. Our SLA with our own customers is 1 second.", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-17", "message": "The sandbox environment has been unreachable since yesterday and our release is blocked on it.", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-18", "message": "Can I filter results by created_at with a range, or only an exact date?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-19", "message": "Uploads over 10MB fail with an opaque error. Smaller ones are fine. Is there a documented limit?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-20", "message": "Your status page says all systems operational but we have had 40 percent error rates for the last thirty minutes.", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-21", "message": "how do i rotate an api key without downtime", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "tec-22", "message": "The SDK pins an old version of requests which conflicts with our stack. Any plan to loosen that?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-23", "message": "Data in the dashboard does not match what the API returns for the same day. Which one is authoritative?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-24", "message": "We need to be live by Thursday and the OAuth callback is still rejecting our redirect URI. This is now the only blocker.", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-25", "message": "I get intermittent 401s maybe one call in fifty, same key, same code path. Clock skew maybe?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-26", "message": "Is there a way to replay webhooks we missed during our own outage last night?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-27", "message": "Not a bug report, just feedback: the error messages on validation failures do not say which field failed.", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "tec-28", "message": "everything is broken again", "queue": "technical", "urgent": "true", "needs_human": "false", "difficulty": "terse"}
-{"id": "tec-29", "message": "Your last release dropped the customer_reference field from the response and it is in our production contract. We need it restored or a migration window.", "queue": "technical", "urgent": "true", "needs_human": "true", "difficulty": "mixed"}
-{"id": "tec-30", "message": "Where do I find the OpenAPI spec?", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "sal-01", "message": "We are a 200 person company evaluating three vendors. Can we get a demo next week?", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-02", "message": "What does the enterprise tier include that the pro tier does not?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "sal-03", "message": "Do you offer nonprofit pricing?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "sal-04", "message": "We want to add 50 seats. Can someone send a quote?", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-05", "message": "Our procurement deadline is Friday and we still do not have a signed order form. Who can get that over the line today?", "queue": "sales", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-06", "message": "Is there a free trial, and does it need a card?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "sal-07", "message": "quote for 1000 seats pls", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "terse"}
-{"id": "sal-08", "message": "I am not looking to buy anything yet, I just want to understand how your pricing scales before I take it to my manager.", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "sal-09", "message": "This is not a complaint. We are actually very happy and want to expand to two more regions. What does that look like commercially?", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "negated"}
-{"id": "sal-10", "message": "We are currently on the pro plan and keep hitting the API rate limit. Is the answer to upgrade, or can limits be raised on our current plan?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "sal-11", "message": "hi we saw you at the conference last month, the guy on the stand said there was a startup programme, is that still a thing, we are seed stage, 8 people", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "noisy"}
-{"id": "sal-12", "message": "Can you send a security questionnaire response and a SOC 2 report? Our procurement will not move without them.", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-13", "message": "Do you have a partner or reseller programme?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "sal-14", "message": "Our contract renews in three weeks and we want to renegotiate the term before it auto renews.", "queue": "sales", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-15", "message": "What is the difference between a seat and an active user in your pricing?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "sal-16", "message": "Competitor X quoted us 30 percent less. Can you match it? We decide on Monday.", "queue": "sales", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-17", "message": "Is there an on premise or self hosted option for regulated customers?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "tec-31", "message": "pricing page 404s for me", "queue": "technical", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "sal-19", "message": "We would like to trial the product with a small team before committing. Is a 30 day pilot possible?", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-20", "message": "Who is my account manager? I have not heard from anyone since we signed.", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-21", "message": "Do you support annual invoicing rather than card payment for enterprise deals?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "sal-22", "message": "demo", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "terse"}
-{"id": "sal-23", "message": "We need a signed DPA before we can go live, and our launch is in ten days.", "queue": "sales", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "sal-24", "message": "Interested in the product. What is the smallest plan you sell?", "queue": "sales", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "sal-25", "message": "Can we get a proof of concept with our own data before signing anything? Happy to sign an NDA first.", "queue": "sales", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-01", "message": "I cannot log in. Password reset emails never arrive.", "queue": "account", "urgent": "true", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-02", "message": "Please add jane@example.com as an admin on our workspace.", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-03", "message": "How do I enable two factor authentication for everyone on the team?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-04", "message": "Our admin left the company and nobody else has owner permissions. We are locked out of user management.", "queue": "account", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-05", "message": "I would like my personal data deleted under GDPR. Please confirm within the statutory period.", "queue": "account", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-06", "message": "cant log in", "queue": "account", "urgent": "true", "needs_human": "false", "difficulty": "terse"}
-{"id": "acc-07", "message": "change email on my account", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "acc-08", "message": "I have not been hacked or anything, I just want to know where to see which devices are signed in.", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "acc-09", "message": "There is no rush on this, but could you merge my two accounts? I signed up twice by mistake years ago.", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "acc-10", "message": "SSO stopped working for the whole company this morning. Nobody can get in. We use Okta.", "queue": "account", "urgent": "true", "needs_human": "false", "difficulty": "mixed"}
-{"id": "acc-11", "message": "we removed a user last month but they are still showing on our invoice as a billable seat", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "acc-12", "message": "SOMEONE HAS ACCESSED MY ACCOUNT FROM ANOTHER COUNTRY. LOCK IT NOW.", "queue": "account", "urgent": "true", "needs_human": "true", "difficulty": "noisy"}
-{"id": "acc-13", "message": "hi so my collegue set this up and then left and i dont know the email it was registered under, is there any way to find out, i have the company card details if that helps", "queue": "account", "urgent": "false", "needs_human": "true", "difficulty": "noisy"}
-{"id": "acc-14", "message": "Can I restrict logins to our corporate IP range?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-15", "message": "I need an export of everything stored about my account. Where do I request it?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-16", "message": "Please deactivate the account for bob@example.com, he left today and had production access.", "queue": "account", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-17", "message": "My 2FA device was stolen and the backup codes were on it. I cannot get into my account.", "queue": "account", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-18", "message": "How many admins can one workspace have?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-19", "message": "I keep getting logged out every few minutes. Is there a session timeout setting?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-20", "message": "We are being audited and need a log of who accessed what over the last 12 months, by the 30th.", "queue": "account", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-21", "message": "Can you transfer ownership of the workspace to me? The current owner has agreed and is copied here.", "queue": "account", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "acc-22", "message": "delete my account", "queue": "account", "urgent": "false", "needs_human": "true", "difficulty": "terse"}
-{"id": "acc-23", "message": "I signed up with Google but now want to use email and password instead. Possible?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "acc-24", "message": "Our SCIM provisioning is creating duplicate users every sync. It has made a mess of our user list.", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "acc-25", "message": "Is there an audit log of permission changes?", "queue": "account", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "abu-01", "message": "Someone is using your platform to send phishing emails that impersonate our brand. Here are three message IDs.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "abu-02", "message": "A user on your service has been harassing one of our employees for weeks. We want it stopped.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "abu-03", "message": "I am getting bulk unsolicited messages from an account hosted with you. How do I report it?", "queue": "abuse", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "abu-04", "message": "My account was compromised and is now sending spam to my whole contact list. Please suspend it immediately.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "abu-05", "message": "report spam", "queue": "abuse", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "abu-06", "message": "phishing from your domain", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "terse"}
-{"id": "abu-07", "message": "This is not spam as far as I can tell, but I keep receiving password reset emails I never asked for. Roughly twenty today.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "negated"}
-{"id": "abu-08", "message": "Nobody has broken any rules yet, but I want to flag an account that keeps posting borderline content aimed at one of our users.", "queue": "abuse", "urgent": "false", "needs_human": "true", "difficulty": "negated"}
-{"id": "abu-09", "message": "we are seeing thousands of signups from one ip range using disposable emails, looks like someone is farming your free tier off our referral link", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "noisy"}
-{"id": "abu-10", "message": "SOMEBODY IS IMPERSONATING OUR CEO USING AN ACCOUNT ON YOUR PLATFORM AND ASKING STAFF FOR WIRE TRANSFERS", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "noisy"}
-{"id": "abu-11", "message": "Our API key was posted publicly on GitHub by a contractor. We rotated it but want to know if it was used.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "mixed"}
-{"id": "abu-12", "message": "There is a fake support account on social media using your logo and asking our customers for their passwords.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "abu-13", "message": "I think another tenant is scraping our public profile pages at a very high rate. Is that allowed under your terms?", "queue": "abuse", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "abu-14", "message": "Received a threatening message through your platform. I have screenshots. What is the process?", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "abu-15", "message": "Someone set up an account using my company email without my permission. I want it removed.", "queue": "abuse", "urgent": "false", "needs_human": "true", "difficulty": "mixed"}
-{"id": "abu-16", "message": "What is your acceptable use policy on automated outbound messaging?", "queue": "abuse", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "abu-17", "message": "We were told our account was suspended for abuse. We run a legitimate newsletter and want to appeal.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "clear"}
-{"id": "abu-18", "message": "Suspicious login alerts from three countries in the last hour on our shared ops account.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "mixed"}
-{"id": "abu-19", "message": "Someone is charging cards through an account on your platform and the chargebacks are landing on us. This is fraud.", "queue": "abuse", "urgent": "true", "needs_human": "true", "difficulty": "mixed"}
-{"id": "abu-20", "message": "How do I block a specific user from contacting me?", "queue": "abuse", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-01", "message": "Do you have any open engineering roles? I could not find a careers page.", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-02", "message": "Just wanted to say the new dashboard is a big improvement. Nice work.", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-03", "message": "Are you attending the conference in Berlin next month?", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-04", "message": "Can I use your logo in a slide deck about our tech stack?", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-05", "message": "hello", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "oth-06", "message": "test please ignore", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "oth-07", "message": "I am a journalist writing about the outage last week. Who handles press enquiries?", "queue": "other", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
-{"id": "oth-08", "message": "This is not a support request. I am a researcher and would like to ask about your approach to model evaluation.", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "oth-09", "message": "No problem to report, just curious whether you publish a roadmap anywhere.", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "negated"}
-{"id": "oth-10", "message": "hi hope youre well, quick one, do you guys sponsor meetups? we run a small python group in manchester about 60 people, would be great to have you along", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "noisy"}
-{"id": "oth-11", "message": "Where can I find your accessibility statement?", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-12", "message": "Our legal team has questions about clause 7.2 of your terms of service before we can proceed.", "queue": "other", "urgent": "false", "needs_human": "true", "difficulty": "mixed"}
-{"id": "oth-13", "message": "I would like to write a guest post for your engineering blog. Who do I talk to?", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-14", "message": "Do you have a bug bounty programme, and what is in scope?", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "mixed"}
-{"id": "oth-15", "message": "Wrong company, sorry. Please disregard my previous message.", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-16", "message": "Can someone confirm you received the documents we posted? It has been three weeks and we have a court date on the 12th.", "queue": "other", "urgent": "true", "needs_human": "true", "difficulty": "mixed"}
-{"id": "oth-17", "message": "Is there a community forum or Slack for users?", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-18", "message": "unsubscribe", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "terse"}
-{"id": "oth-19", "message": "I am writing a dissertation on support automation and would like to interview someone on your team.", "queue": "other", "urgent": "false", "needs_human": "false", "difficulty": "clear"}
-{"id": "oth-20", "message": "Following up on my email from Tuesday. Still no reply from anyone.", "queue": "other", "urgent": "false", "needs_human": "true", "difficulty": "clear"}
+{"id": "sml-01", "message": "Convert 180 pounds to kilograms.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-02", "message": "What is the capital of Australia?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-03", "message": "Rewrite this sentence in the past tense: The team ships the release on Friday.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-04", "message": "Turn this list into a comma-separated string: apples, pears, plums.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-05", "message": "hi", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-06", "message": "thanks, that worked", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-07", "message": "What does the acronym API stand for?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-08", "message": "Make this subject line shorter: Reminder about the upcoming quarterly planning session on Thursday.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-09", "message": "Spell check this: Recieve the pacakge by tommorow.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-10", "message": "What is 15 percent of 240?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-11", "message": "What is my current account balance?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "sml-12", "message": "What time is my next meeting?", "tier": "small", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-13", "message": "How many days until 25 December?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-14", "message": "Translate good morning into Spanish.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-15", "message": "Give me a synonym for robust.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-16", "message": "Format this as JSON: name Alice, age 31, city Leeds.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-17", "message": "What is the boiling point of water in Fahrenheit?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-18", "message": "Did my prescription refill go through?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "sml-19", "message": "capital of peru", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-20", "message": "Change this to title case: the quick brown fox jumps over the lazy dog", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-21", "message": "This is not a hard question, I promise: what is the plural of cactus?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "sml-22", "message": "No need to think about this one, just tell me what HTTP status code means not found.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "sml-23", "message": "whats the wifi password", "tier": "small", "needs_tools": "true", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-24", "message": "how do u spell definately", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "noisy"}
+{"id": "sml-25", "message": "When does my insurance policy renew?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "sml-26", "message": "Shorten this to under 100 characters: We are pleased to announce that our new office will open in March next year.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-27", "message": "What year did the Berlin Wall fall?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-28", "message": "Add bullet points to these three items: coffee, milk, sugar.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-29", "message": "Is the office open on Monday?", "tier": "small", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-30", "message": "Define idempotent in one sentence.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-31", "message": "How many ounces in a litre?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-32", "message": "Fix the capitalisation: london is the capital of the united kingdom", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-33", "message": "What is the last payment that left my account?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "sml-34", "message": "Give me a three word tagline for a coffee shop.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-35", "message": "good morning! hope youre well :)", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "noisy"}
+{"id": "sml-36", "message": "Which is bigger, 3/8 or 0.4?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-37", "message": "What is the file extension for a Python script?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-38", "message": "Remove the emoji from this: Great work today everyone!", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-39", "message": "Has my parcel been delivered yet?", "tier": "small", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-40", "message": "Say that again but more politely.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-41", "message": "What allergy is listed on my patient record?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "sml-42", "message": "Count the words in this sentence for me.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-43", "message": "What does LGTM mean?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-44", "message": "Sort these alphabetically: zebra, apple, mango, kiwi.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-45", "message": "Who wrote Pride and Prejudice?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-46", "message": "Convert this timestamp to ISO 8601: 3 March 2026, 4pm.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-47", "message": "How much annual leave do I have left?", "tier": "small", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-48", "message": "Make this all lowercase please", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "sml-49", "message": "What is the chemical symbol for sodium?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "sml-50", "message": "Not asking for advice, just the number: what is the current base rate?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "negated"}
+{"id": "med-01", "message": "Write a Python function that reads a CSV and returns the rows where the amount column is above a threshold.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-02", "message": "Summarise this three page meeting transcript into five bullet points with the decisions and owners.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-03", "message": "Explain the difference between a process and a thread to a junior developer.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-04", "message": "Draft a polite email declining a vendor's proposal without closing the door on future work.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-05", "message": "My unit test fails with an assertion error on an empty list. Here is the function and the test, what is wrong?", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-06", "message": "Compare Postgres and MySQL for a read-heavy analytics workload. Three points each.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-07", "message": "Write a SQL query that gives monthly revenue per region for the last twelve months.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-08", "message": "Turn these interview notes into a structured candidate summary with strengths and concerns.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-09", "message": "Refactor this 40 line function so the validation is separate from the calculation.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-10", "message": "Write a regex that matches UK postcodes and explain each part of it.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-11", "message": "review this pr", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "med-12", "message": "summarise the attached report", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "med-13", "message": "explain this stack trace", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "med-14", "message": "Write release notes from this list of merged pull request titles.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-15", "message": "This is straightforward, nothing tricky: write a bash script that rotates log files older than 7 days.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "med-16", "message": "Nothing legal about this, purely editorial: tighten up the wording of our refund policy page.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "med-17", "message": "can u write a func that takes a date string and returns the weekday, dont care about timezones", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "noisy"}
+{"id": "med-18", "message": "Explain what a load balancer does and when you would need one.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-19", "message": "Convert this REST endpoint into a GraphQL query and mutation pair.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-20", "message": "Write unit tests for this pure function covering the edge cases.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-21", "message": "Summarise the customer feedback in this spreadsheet into three themes.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-22", "message": "Explain our current deployment pipeline to a new starter based on the README.", "tier": "medium", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-23", "message": "Write a product description for a waterproof hiking backpack, about 120 words.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-24", "message": "What is the time complexity of this sorting function and can it be improved easily?", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-25", "message": "Rewrite this technical paragraph so a non-technical stakeholder understands it.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-26", "message": "Turn this user story into acceptance criteria.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-27", "message": "Why is my Docker build slow? Here is the Dockerfile.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-28", "message": "Generate a weekly standup summary from our issue tracker activity.", "tier": "medium", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-29", "message": "Explain the trade-offs between REST and gRPC for an internal service.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-30", "message": "Write a cover letter for a data analyst role based on this CV.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-31", "message": "Take this 600 word blog draft and cut it to 300 without losing the argument.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-32", "message": "Write a Terraform module for an S3 bucket with versioning and encryption enabled.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-33", "message": "What are the main causes of memory leaks in long-running Node services?", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-34", "message": "Convert this pandas operation to polars and keep the behaviour identical.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-35", "message": "Draft a short announcement for the team about moving standup to 9:30.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-36", "message": "Explain why my CSS grid layout collapses on mobile. Here is the markup.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-37", "message": "Write an onboarding checklist for a new backend engineer.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-38", "message": "Categorise these 200 support tickets into themes and give me the counts.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-39", "message": "Give me three A/B test ideas for our signup page and what each would measure.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-40", "message": "Explain the CAP theorem with a concrete example.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-41", "message": "Write a python script to rename all files in a folder to lowercase with underscores.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-42", "message": "How should I structure a README for an open source library?", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-43", "message": "Summarise what changed in our codebase this week from the git log.", "tier": "medium", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-44", "message": "Write a polite chaser email for an invoice that is two weeks overdue.", "tier": "medium", "needs_tools": "false", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "med-45", "message": "Explain what this error message means: connection reset by peer.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-46", "message": "Make a comparison table of three project management tools for a team of 12.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-47", "message": "Write a GitHub Actions workflow that runs tests on pull requests.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-48", "message": "Take these meeting notes and write the follow-up email to the client.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-49", "message": "What is the difference between authentication and authorisation, with an example each?", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "med-50", "message": "Add type hints to this module and tell me anything that looks wrong while you are there.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-01", "message": "Design a multi-region active-active architecture for our payments service with an RPO near zero, and justify the consistency trade-offs.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-02", "message": "We have been served a GDPR data subject access request that spans three systems and a contested retention period. What is our obligation and what should we do first?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-03", "message": "Prove that the sum of the first n odd numbers equals n squared, by induction, and then generalise the argument.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-04", "message": "My father is on warfarin and has just been prescribed an antibiotic. What interactions should we be asking the pharmacist about?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-05", "message": "Our migration has to move 400 million rows with under five minutes of downtime and a rollback path at every step. Plan it.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-06", "message": "Should I accept a settlement of 40 thousand or go to tribunal? Here are the facts of the case.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-07", "message": "Work out whether this distributed locking scheme is safe under network partition, and if not, construct the failure interleaving.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-08", "message": "Model the five year cash flow impact of moving from perpetual licences to subscription, including churn and deferred revenue.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-09", "message": "Our structural engineer has flagged a load-bearing wall in the renovation plans. What are the consequences of removing it and what sign-off is required?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-10", "message": "Derive the gradient of this loss function and explain why it is numerically unstable near zero.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-11", "message": "design our whole auth system", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "terse"}
+{"id": "pwr-12", "message": "is this contract clause enforceable", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "terse"}
+{"id": "pwr-13", "message": "root cause this outage", "tier": "powerful", "needs_tools": "true", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "pwr-14", "message": "Nothing urgent and no rush at all, but I need a full threat model for our new payments integration before the security review.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "negated"}
+{"id": "pwr-15", "message": "Probably a simple question: why does our consensus protocol lose writes when a follower rejoins after a partition, and how do we fix it without breaking linearisability?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "pwr-16", "message": "ok so we have 3 services all writing to the same table, sometimes we get duplicates, sometimes we lose updates, weve tried locking but throughput tanked, whats the actual right design here", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "noisy"}
+{"id": "pwr-17", "message": "I AM BEING MADE REDUNDANT AND THEY WANT ME TO SIGN SOMETHING TODAY WHAT ARE MY RIGHTS", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "noisy"}
+{"id": "pwr-18", "message": "Plan the capacity and cost of serving a 7B model at 2000 requests per second with a 200ms p99, and show the reasoning.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-19", "message": "Given these three conflicting stakeholder requirements, propose an architecture and explain what each stakeholder loses.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-20", "message": "Our model shows a 3 point lift but the holdout is imbalanced and the assignment was not fully random. Is the result trustworthy, and what would make it so?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-21", "message": "Write a formal proof that this scheduling algorithm terminates and bounds the worst case wait.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-22", "message": "We are being acquired and need to decide whether to novate or assign our customer contracts. What are the risks of each?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-23", "message": "Diagnose this intermittent production deadlock from the thread dumps and the schema, and propose a fix that does not require downtime.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-24", "message": "My test results came back with a raised marker and the letter mentions further investigation. What does this actually mean and what should I ask my doctor?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-25", "message": "Design a rate limiting scheme that is fair across tenants, survives a node loss, and does not require a shared clock.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-26", "message": "Should we restate last year's figures given this accounting treatment change? Walk me through the implications.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-27", "message": "Explain why this cryptographic protocol is vulnerable to a replay attack and design a mitigation that preserves forward secrecy.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-28", "message": "Our latency regressed 4x after a dependency upgrade and the flame graph is flat. Work out where the time is going.", "tier": "powerful", "needs_tools": "true", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-29", "message": "Build the argument for and against rewriting our monolith, with the decision criteria we should use and what would change your recommendation.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-30", "message": "Solve this constraint problem: eight teams, four rooms, three time slots, no team meets the same opponent twice, and two teams cannot play before noon.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-31", "message": "Assess whether our data retention policy is compliant across the UK, EU and California, and flag where they conflict.", "tier": "powerful", "needs_tools": "true", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-32", "message": "Given this incident timeline, write the post-mortem including contributing factors, and distinguish the causes from the coincidences.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-33", "message": "Design the schema and the consistency model for a ledger that must be auditable and never lose a transaction.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-34", "message": "Is our use of this open source library compatible with shipping a closed source product? The licence is AGPL with a linking exception.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-35", "message": "Reconcile these two contradictory datasets and tell me which one to trust, with your reasoning.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-36", "message": "Work through whether this pricing change increases or decreases total revenue given the elasticity estimates and our churn curve.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-37", "message": "Explain, from first principles, why this concurrent data structure is lock-free but not wait-free.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-38", "message": "We think a contractor exfiltrated customer data before leaving. What do we need to do, in what order, and what are our disclosure obligations?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-39", "message": "Design an evaluation that would actually tell us whether this model is better in production, not just on the benchmark.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-40", "message": "Plan a zero-downtime cutover from our legacy auth provider for 2 million users, including the rollback and the failure modes.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-41", "message": "Given these symptoms and this medication list, what differential should we be considering and what would rule each in or out?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-42", "message": "Find the bug in this lock-free queue implementation. It only corrupts under heavy contention on ARM.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-43", "message": "Should we take the convertible note at this valuation cap or hold out for a priced round? Here are our runway numbers.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-44", "message": "Derive the closed form for this recurrence and state the conditions under which it converges.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-45", "message": "Write the technical strategy for the next two years given our team size, our debt, and the three bets the board wants.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-46", "message": "Analyse whether this experiment was underpowered and what sample size we would have needed to detect the effect we claimed.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-47", "message": "Our insurer is disputing the claim on a technicality in the policy wording. Read it and tell me whether they have a case.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-48", "message": "Design the sharding strategy and explain what happens to every query pattern we have when we resize the cluster.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "pwr-49", "message": "Explain the mechanism by which this drug class causes the side effect, and why it does not happen with the older generation.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "clear"}
+{"id": "pwr-50", "message": "Take these conflicting benchmark results and work out which methodology is flawed and why.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "clear"}
+{"id": "hrd-01", "message": "Quick one: what is our churn rate?", "tier": "small", "needs_tools": "true", "is_sensitive": "false", "difficulty": "mixed"}
+{"id": "hrd-02", "message": "Quick one: why is our churn rate rising and what should we do about it?", "tier": "powerful", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "hrd-03", "message": "Simple question really. Is our encryption at rest configuration sufficient for PCI DSS, and if not what is missing?", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "negated"}
+{"id": "hrd-04", "message": "This is going to sound complicated but it is not: what is the default port for PostgreSQL?", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "hrd-05", "message": "urgent!!! whats 2+2", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "mixed"}
+{"id": "hrd-06", "message": "redesign everything", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "hrd-07", "message": "fix typo", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "hrd-08", "message": "thoughts?", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "hrd-09", "message": "Write a function to add two numbers. Then, separately, design the fault tolerance strategy for our order pipeline.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "hrd-10", "message": "I know this is a legal grey area but honestly I just want to know the word count of the clause.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "hrd-11", "message": "not a medical question at all, purely spelling: how do you spell paracetamol", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "hrd-12", "message": "hey quick favour, can u just double check whether our termination clause lets them walk after 30 days, its probably fine but legal are asking", "tier": "powerful", "needs_tools": "true", "is_sensitive": "true", "difficulty": "noisy"}
+{"id": "hrd-13", "message": "SUPER SIMPLE PLEASE JUST TELL ME: should we migrate to microservices or not, we have 9 engineers and a monolith that deploys twice a day", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "noisy"}
+{"id": "hrd-14", "message": "Summarise this in one line.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "hrd-15", "message": "Explain quantum computing.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "mixed"}
+{"id": "hrd-16", "message": "Explain why Shor's algorithm breaks RSA but not lattice-based schemes, and what that means for our key rotation plan.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "hrd-17", "message": "whats my dose", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "terse"}
+{"id": "hrd-18", "message": "should i change my dose", "tier": "powerful", "needs_tools": "false", "is_sensitive": "true", "difficulty": "terse"}
+{"id": "hrd-19", "message": "Nothing complicated, just reformat this SQL. Do not change the logic, I know the join is wrong and I will deal with that separately.", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "negated"}
+{"id": "hrd-20", "message": "can you look at why the numbers dont add up, finance says one thing the dashboard says another and the board meeting is thursday", "tier": "powerful", "needs_tools": "true", "is_sensitive": "true", "difficulty": "noisy"}
+{"id": "hrd-21", "message": "What does this regex do? ^\\d{3}-\\d{2}$", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "mixed"}
+{"id": "hrd-22", "message": "Write the regex, prove it terminates on adversarial input, and bound the backtracking.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "mixed"}
+{"id": "hrd-23", "message": "translate this contract to french", "tier": "medium", "needs_tools": "false", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "hrd-24", "message": "ty!", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "hrd-25", "message": "so like the thing isnt working and i tried restarting it and clearing the cache and it still does the thing, any ideas, its the checkout page", "tier": "medium", "needs_tools": "true", "is_sensitive": "false", "difficulty": "noisy"}
+{"id": "hrd-26", "message": "Give me the one number: what was Q3 revenue?", "tier": "small", "needs_tools": "true", "is_sensitive": "true", "difficulty": "mixed"}
+{"id": "hrd-27", "message": "I am not asking you to give me legal advice. Just summarise what this clause says in plain English.", "tier": "medium", "needs_tools": "false", "is_sensitive": "true", "difficulty": "negated"}
+{"id": "hrd-28", "message": "Optimise this query.", "tier": "medium", "needs_tools": "false", "is_sensitive": "false", "difficulty": "terse"}
+{"id": "hrd-29", "message": "Optimise this query. It is the hot path for 40 million daily requests and we cannot change the schema or take a lock.", "tier": "powerful", "needs_tools": "false", "is_sensitive": "false", "difficulty": "mixed"}
+{"id": "hrd-30", "message": "ELI5 how interest works", "tier": "small", "needs_tools": "false", "is_sensitive": "false", "difficulty": "mixed"}

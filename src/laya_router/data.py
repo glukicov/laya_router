@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from laya_router.questions import BOOLEAN_IDS, QUEUES
+from laya_router.questions import BOOLEAN_IDS, TIERS
 
 DATASET = Path(__file__).resolve().parents[2] / "data" / "requests.jsonl"
 
@@ -31,11 +31,11 @@ def _validate(raw: dict[str, Any], line_number: int) -> Request:
     A typo in a gold label is invisible in the metrics and quietly wrong in the write-up, so the
     dataset is checked on every load rather than trusted.
     """
-    missing = {"id", "message", "queue", "difficulty", *BOOLEAN_IDS} - set(raw)
+    missing = {"id", "message", "tier", "difficulty", *BOOLEAN_IDS} - set(raw)
     if missing:
         raise ValueError(f"line {line_number}: missing {sorted(missing)}")
-    if raw["queue"] not in QUEUES:
-        raise ValueError(f"line {line_number}: queue {raw['queue']!r} is not one of {sorted(QUEUES)}")
+    if raw["tier"] not in TIERS:
+        raise ValueError(f"line {line_number}: tier {raw['tier']!r} is not one of {sorted(TIERS)}")
     if raw["difficulty"] not in DIFFICULTIES:
         raise ValueError(f"line {line_number}: difficulty {raw['difficulty']!r} is not one of {list(DIFFICULTIES)}")
     for qid in BOOLEAN_IDS:
@@ -44,7 +44,7 @@ def _validate(raw: dict[str, Any], line_number: int) -> Request:
     if not str(raw["message"]).strip():
         raise ValueError(f"line {line_number}: message is empty")
 
-    labels = {"queue": str(raw["queue"])} | {qid: str(raw[qid]) for qid in BOOLEAN_IDS}
+    labels = {"tier": str(raw["tier"])} | {qid: str(raw[qid]) for qid in BOOLEAN_IDS}
     return Request(id=str(raw["id"]), message=str(raw["message"]), difficulty=str(raw["difficulty"]), labels=labels)
 
 

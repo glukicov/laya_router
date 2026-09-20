@@ -12,10 +12,10 @@ from time import perf_counter
 from typing import Any
 
 from laya_router.backends.base import BackendName
-from laya_router.questions import BOOLEAN_IDS, QUEUES, render_for_prompt
+from laya_router.questions import BOOLEAN_IDS, TIERS, render_for_prompt
 from laya_router.schema import Decision, TriageResult
 
-DEFAULT_MODEL = "gpt-4.1-nano"
+DEFAULT_MODEL = "gpt-5-nano"
 
 # USD per million tokens (input, output), read from OpenAI's pricing page in February 2026. Prices
 # move; `laya-router eval run --price-in/--price-out` overrides these without editing code, and
@@ -31,9 +31,9 @@ PRICES: dict[str, tuple[float, float]] = {
 }
 
 SYSTEM_PROMPT = (
-    "You triage inbound customer support messages. Answer every question about the message using "
-    "only what the message says. For each question also give a confidence between 0 and 1: the "
-    "probability that your own answer is correct.\n\n"
+    "You are the router in front of a fleet of language models. For each incoming user request, answer "
+    "every question below using only what the request says. For each question also give a confidence "
+    "between 0 and 1: the probability that your own answer is correct.\n\n"
     f"{render_for_prompt()}"
 )
 
@@ -45,8 +45,8 @@ def _response_schema() -> dict[str, Any]:
     model is asked for exactly the options Laya scores, including their order.
     """
     properties: dict[str, Any] = {
-        "queue": {"type": "string", "enum": list(QUEUES)},
-        "queue_confidence": {"type": "number"},
+        "tier": {"type": "string", "enum": list(TIERS)},
+        "tier_confidence": {"type": "number"},
     }
     for qid in BOOLEAN_IDS:
         properties[qid] = {"type": "boolean"}
@@ -70,7 +70,7 @@ def price_for(model: str) -> tuple[float, float]:
 
 
 class OpenAIBackend:
-    """Classify one message per API call, with the answer constrained by a JSON schema."""
+    """Route one request per API call, with the answer constrained by a JSON schema."""
 
     name: BackendName = "openai"
 
@@ -102,7 +102,7 @@ class OpenAIBackend:
     def warmup(self) -> float:
         """Open the connection before timing anything, so TLS setup is not counted as latency."""
         started = perf_counter()
-        self.classify("My invoice looks wrong.")
+        self.classify("Convert 10 miles to kilometres.")
         return perf_counter() - started
 
     def classify(self, message: str) -> TriageResult:
@@ -126,7 +126,7 @@ class OpenAIBackend:
         input_tokens = int(getattr(usage, "prompt_tokens", 0) or 0)
         output_tokens = int(getattr(usage, "completion_tokens", 0) or 0)
 
-        decisions = {"queue": _string_decision(payload, "queue")}
+        decisions = {"tier": _string_decision(payload, "tier")}
         for qid in BOOLEAN_IDS:
             decisions[qid] = _boolean_decision(payload, qid)
 

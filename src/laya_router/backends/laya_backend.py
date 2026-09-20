@@ -30,7 +30,7 @@ MODEL_ID = "convaiinnovations/laya"
 # which is the 843 MB we actually run.
 MODEL_FILES = ("model.safetensors", "rl_agent_config.json", "encoder/*", "tokenizer/*")
 
-WARMUP_MESSAGE = "I was billed twice for invoice 4411. Please refund the duplicate charge today."
+WARMUP_MESSAGE = "Write a Python function that parses this CSV and returns the rows above a threshold."
 
 
 def load_agent(device: str | None = None) -> Any:
@@ -47,10 +47,16 @@ def _decision(qid: str, answer: dict[str, Any]) -> Decision:
     coin flip, which is what makes a yes/no answer comparable with a six-way one.
     """
     if answer["type"] == "choice":
+        probabilities = {k: float(v) for k, v in answer["probabilities"].items()}
+        # Deliberately NOT the SDK's `confidence` field. For a choice question that field is normalised
+        # entropy, 1 - H(p)/log(k): a measure of how peaked the distribution is, which is not on the same
+        # scale as "the probability this answer is right". The evaluation compares Laya's confidence against
+        # a generative model's self-reported P(correct), so both sides must mean the same thing, and the
+        # decision head already provides it as the probability of the chosen option.
         return Decision(
             answer=str(answer["choice"]),
-            confidence=float(answer["confidence"]),
-            probabilities={k: float(v) for k, v in answer["probabilities"].items()},
+            confidence=max(probabilities.values()),
+            probabilities=probabilities,
         )
     if answer["type"] == "noul":
         p_true = float(answer["noul"])

@@ -10,7 +10,7 @@ from collections.abc import Sequence
 from typing import Any
 
 from laya_router.data import Request
-from laya_router.questions import BOOLEAN_IDS, QUESTION_IDS
+from laya_router.questions import BOOLEAN_IDS, QUESTION_IDS, ROUTE_ID, TIER_ORDER
 
 #: Bins used for expected calibration error and the reliability diagram.
 CALIBRATION_BINS = 10
@@ -161,6 +161,8 @@ def score(rows: list[dict[str, Any]], requests: Sequence[Request]) -> dict[str, 
         if qid not in BOOLEAN_IDS:
             entry["macro_f1"] = macro_f1(predicted, gold)
             entry["confusion"] = _confusion(predicted, gold)
+        if qid == ROUTE_ID:
+            entry.update(routing_errors(predicted, gold))
         per_question[qid] = entry
 
     exact = [all(by_id[r.id][f"{qid}_answer"] == r.labels[qid] for qid in QUESTION_IDS) for r in matched]
@@ -185,6 +187,25 @@ def score(rows: list[dict[str, Any]], requests: Sequence[Request]) -> dict[str, 
         "cost_usd_per_1k": sum(float(by_id[r.id]["cost_usd"]) for r in matched) / len(matched) * 1_000,
         "input_tokens": sum(int(by_id[r.id]["input_tokens"]) for r in matched),
         "output_tokens": sum(int(by_id[r.id]["output_tokens"]) for r in matched),
+    }
+
+
+def routing_errors(predicted: Sequence[str], gold: Sequence[str]) -> dict[str, Any]:
+    """Split the route's mistakes by which way they went, because they cost different things.
+
+    Sending a request to a tier above what it needed wastes money on every such request. Sending it below
+    means the answer comes back worse, which is the failure a user notices. A single accuracy number hides
+    which of the two a router prefers, and that preference is the whole design question.
+    """
+    over = sum(TIER_ORDER.index(p) > TIER_ORDER.index(g) for p, g in zip(predicted, gold, strict=True))
+    under = sum(TIER_ORDER.index(p) < TIER_ORDER.index(g) for p, g in zip(predicted, gold, strict=True))
+    # Two tiers off: the route skipped a level entirely, in either direction.
+    severe = sum(abs(TIER_ORDER.index(p) - TIER_ORDER.index(g)) == 2 for p, g in zip(predicted, gold, strict=True))
+    return {
+        "overspend_rate": over / len(gold),
+        "underspend_rate": under / len(gold),
+        "two_tiers_off_rate": severe / len(gold),
+        "share": {tier: predicted.count(tier) / len(predicted) for tier in TIER_ORDER},
     }
 
 

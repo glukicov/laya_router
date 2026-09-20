@@ -1,33 +1,39 @@
-"""The ablation must change only the queue wording, and must never score against absent options."""
+"""The ablation must change only the tier wording, and must score the route by direction of error."""
 
 from typing import Any
 
-from laya_router.ablation import NO_CATCH_ALL, VARIANTS, questions_for, run
+from laya_router.ablation import BARE, VARIANTS, questions_for, run
 from laya_router.backends.base import BackendName
 from laya_router.data import Request
+from laya_router.metrics import routing_errors
 from laya_router.questions import QUESTIONS
 
 
-def test_only_the_queue_criteria_change() -> None:
-    swapped = questions_for({"billing": "money", "other": "anything else"})
+def test_only_the_tier_criteria_change() -> None:
+    swapped = questions_for({"small": "cheap", "medium": "middling", "powerful": "dear"})
 
-    assert swapped["queue"]["criteria"] == {"billing": "money", "other": "anything else"}
-    assert swapped["queue"]["instructions"] == QUESTIONS["queue"]["instructions"]
-    assert swapped["urgent"] == QUESTIONS["urgent"]
-    # The shipped question set must not be mutated by building a variant.
-    assert QUESTIONS["queue"]["criteria"] != swapped["queue"]["criteria"]
+    assert swapped["tier"]["criteria"] == {"small": "cheap", "medium": "middling", "powerful": "dear"}
+    assert swapped["tier"]["instructions"] == QUESTIONS["tier"]["instructions"]
+    assert swapped["needs_tools"] == QUESTIONS["needs_tools"]
+    # Building a variant must not mutate the shipped question set.
+    assert QUESTIONS["tier"]["criteria"] != swapped["tier"]["criteria"]
 
 
-def test_variant_without_a_catch_all_drops_messages_it_cannot_answer() -> None:
+def test_every_variant_offers_all_three_tiers() -> None:
+    for name, criteria in VARIANTS.items():
+        assert list(criteria) == ["small", "medium", "powerful"], name
+
+
+def test_run_asks_only_the_tier_question_and_scores_the_direction_of_error() -> None:
     class StubAgent:
         def __init__(self) -> None:
-            self.seen_options: list[list[str]] = []
+            self.asked: list[list[str]] = []
 
         def predict(self, state: dict[str, str], questions: dict[str, Any]) -> dict[str, Any]:
             del state
-            options = list(questions["queue"]["criteria"])
-            self.seen_options.append(options)
-            return {"answers": {"queue": {"type": "choice", "choice": options[0], "confidence": 0.5}}}
+            self.asked.append(sorted(questions))
+            # Always routes to the cheapest tier, so every non-small request is underspent.
+            return {"answers": {"tier": {"type": "choice", "choice": "small", "confidence": 0.5}}}
 
     class StubBackend:
         name: BackendName = "laya"
@@ -48,24 +54,32 @@ def test_variant_without_a_catch_all_drops_messages_it_cannot_answer() -> None:
             id="a",
             message="m",
             difficulty="clear",
-            labels={"queue": "billing", "urgent": "false", "needs_human": "false"},
+            labels={"tier": "small", "needs_tools": "false", "is_sensitive": "false"},
         ),
         Request(
             id="b",
             message="m",
             difficulty="clear",
-            labels={"queue": "other", "urgent": "false", "needs_human": "false"},
+            labels={"tier": "powerful", "needs_tools": "false", "is_sensitive": "false"},
         ),
     ]
 
-    rows = run(StubBackend(agent), requests, variants={"no-catch-all": NO_CATCH_ALL})
+    rows = run(StubBackend(agent), requests, variants={"names only": BARE})
 
-    # The `other` message has no correct option to pick, so it is excluded rather than counted as a failure.
-    assert rows[0]["n"] == 1
-    assert "other" not in agent.seen_options[0]
+    assert agent.asked == [["tier"], ["tier"]], "the yes/no questions must not be re-asked"
+    assert rows[0]["accuracy"] == 0.5
+    assert rows[0]["underspend_rate"] == 0.5
+    assert rows[0]["overspend_rate"] == 0.0
+    assert rows[0]["share"] == {"small": 1.0, "medium": 0.0, "powerful": 0.0}
 
 
-def test_every_shipped_variant_offers_at_least_five_queues() -> None:
-    for name, criteria in VARIANTS.items():
-        assert len(criteria) >= 5, name
-        assert all(isinstance(text, str) and text for text in criteria.values()), name
+def test_routing_errors_separates_overspend_from_underspend() -> None:
+    gold = ["small", "small", "powerful", "medium"]
+    predicted = ["powerful", "small", "small", "medium"]
+
+    errors = routing_errors(predicted, gold)
+
+    # One request sent two tiers too high, one sent two tiers too low, two correct.
+    assert errors["overspend_rate"] == 0.25
+    assert errors["underspend_rate"] == 0.25
+    assert errors["two_tiers_off_rate"] == 0.5

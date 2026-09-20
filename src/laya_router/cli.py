@@ -10,8 +10,9 @@ import typer
 
 from laya_router.backends.base import BackendName
 from laya_router.data import DATASET, load_requests, read_jsonl
-from laya_router.evaluate import RESULTS, adjudicate, run
+from laya_router.evaluate import RESULTS, agreement, label_blind, run
 from laya_router.metrics import score
+from laya_router.questions import ROUTE_ID
 
 app = typer.Typer(add_completion=False, help="One triage job, two brains: Laya against an OpenAI classifier.")
 eval_app = typer.Typer(add_completion=False, help="Run and score the head-to-head evaluation.")
@@ -138,7 +139,7 @@ def eval_adjudicate(
     model: str = typer.Option("gpt-5", help="A strong model, independent of the one under test."),
     out: Annotated[Path, typer.Option("--out")] = RESULTS / "adjudication.jsonl",
 ) -> None:
-    """Audit the hand-written gold labels with a stronger, independent model."""
+    """Have a stronger model label the set blind, then report agreement with the gold labels."""
     _load_env()
     from openai import OpenAI
 
@@ -146,11 +147,12 @@ def eval_adjudicate(
     if not key:
         raise typer.BadParameter("OPENAI_API_KEY is not set")
     requests = load_requests(dataset)
-    rows = adjudicate(OpenAI(api_key=key, timeout=120.0, max_retries=3), requests, model=model, out_path=out)
-    disagreements = [row for row in rows if row["verdict"] == "disagree"]
-    typer.echo(f"{len(rows) - len(disagreements)}/{len(rows)} labels upheld by {model}")
-    for row in disagreements:
-        typer.echo(f"  {row['id']}: {row['field']} -> {row['suggested']} ({row['reason']})")
+    rows = label_blind(OpenAI(api_key=key, timeout=180.0, max_retries=3), requests, model=model, out_path=out)
+
+    scores = agreement(rows)
+    typer.echo(f"Blind agreement between the gold labels and {model}, on {len(rows)} requests:")
+    for qid, value in scores.items():
+        typer.echo(f"  {qid:12s} {value:.3f}")
     typer.echo(str(out), err=True)
 
 
@@ -183,6 +185,13 @@ def eval_ablate(
         )
     typer.echo(str(out), err=True)
 
+    metrics_path = out.parent / "metrics.json"
+    if metrics_path.exists():
+        from laya_router.plots import render_all
+
+        for path in render_all(metrics_path):
+            typer.echo(str(path))
+
 
 @app.command()
 def figures(results: ResultsOption = RESULTS) -> None:
@@ -195,13 +204,18 @@ def figures(results: ResultsOption = RESULTS) -> None:
 
 def _summary_table(summaries: dict[str, dict[str, Any]]) -> str:
     """A small markdown table, so a run can be pasted straight into the write-up."""
-    header = "| backend | model | exact match | queue F1 | urgent acc | needs_human acc | ECE | p50 ms | $/1k |"
-    lines = [header, "|---|---|---:|---:|---:|---:|---:|---:|---:|"]
+    header = (
+        "| router | model | route acc | macro F1 | too expensive | too weak "
+        "| needs_tools | is_sensitive | ECE | p50 ms | $/1k |"
+    )
+    lines = [header, "|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|"]
     for name, s in summaries.items():
-        q = s["questions"]
+        route = s["questions"][ROUTE_ID]
         lines.append(
-            f"| {name} | {s['model']} | {s['exact_match']:.3f} | {q['queue']['macro_f1']:.3f} "
-            f"| {q['urgent']['accuracy']:.3f} | {q['needs_human']['accuracy']:.3f} "
+            f"| {name} | {s['model']} | {route['accuracy']:.3f} | {route['macro_f1']:.3f} "
+            f"| {route['overspend_rate']:.1%} | {route['underspend_rate']:.1%} "
+            f"| {s['questions']['needs_tools']['accuracy']:.3f} "
+            f"| {s['questions']['is_sensitive']['accuracy']:.3f} "
             f"| {s['overall_ece']:.3f} | {s['latency_ms']['p50']:.0f} | ${s['cost_usd_per_1k']:.2f} |"
         )
     return "\n".join(lines)

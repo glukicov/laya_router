@@ -8,7 +8,7 @@ because every other test uses a fake, and a fake cannot catch the SDK changing t
 
 import pytest
 
-from laya_router.questions import QUEUES
+from laya_router.questions import TIERS
 from laya_router.schema import Decision
 
 
@@ -19,15 +19,15 @@ def test_real_checkpoint_answers_every_question_in_one_pass() -> None:
     backend = LayaBackend()
     result = backend.classify("I was billed twice for invoice 4411. Please refund the duplicate charge today.")
 
-    assert set(result.decisions) == {"queue", "urgent", "needs_human"}
+    assert set(result.decisions) == {"tier", "needs_tools", "is_sensitive"}
     assert all(isinstance(d, Decision) for d in result.decisions.values())
-    assert result.decisions["queue"].answer in QUEUES
+    assert result.decisions["tier"].answer in TIERS
     # The model reads the message but writes nothing, so a token bill would be input-only.
     assert result.input_tokens > 0
     assert result.output_tokens == 0
 
     # Probabilities must be a distribution, or the calibration analysis is meaningless.
-    total = sum(result.decisions["queue"].probabilities.values())
+    total = sum(result.decisions["tier"].probabilities.values())
     assert total == pytest.approx(1.0, abs=0.01)
 
     # Warm inference must be far quicker than the cold construction it follows.

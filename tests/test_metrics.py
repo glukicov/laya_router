@@ -53,16 +53,16 @@ def test_score_aligns_rows_to_requests_by_id_not_order() -> None:
             id="a",
             message="m",
             difficulty="clear",
-            labels={"queue": "billing", "urgent": "true", "needs_human": "false"},
+            labels={"tier": "small", "needs_tools": "true", "is_sensitive": "false"},
         ),
         Request(
             id="b",
             message="m",
             difficulty="terse",
-            labels={"queue": "sales", "urgent": "false", "needs_human": "false"},
+            labels={"tier": "powerful", "needs_tools": "false", "is_sensitive": "false"},
         ),
     ]
-    rows = [_row("b", "sales", "false", "false"), _row("a", "billing", "true", "false")]
+    rows = [_row("b", "powerful", "false", "false"), _row("a", "small", "true", "false")]
 
     summary = score(rows, requests)
 
@@ -72,7 +72,7 @@ def test_score_aligns_rows_to_requests_by_id_not_order() -> None:
     assert summary["cost_usd_per_1k"] == 1.0
 
 
-def _row(request_id: str, queue: str, urgent: str, needs_human: str) -> dict[str, object]:
+def _row(request_id: str, tier: str, needs_tools: str, is_sensitive: str) -> dict[str, object]:
     return {
         "id": request_id,
         "backend": "laya",
@@ -81,12 +81,12 @@ def _row(request_id: str, queue: str, urgent: str, needs_human: str) -> dict[str
         "input_tokens": 1,
         "output_tokens": 0,
         "cost_usd": 0.001,
-        "queue_answer": queue,
-        "queue_confidence": 0.9,
-        "urgent_answer": urgent,
-        "urgent_confidence": 0.9,
-        "needs_human_answer": needs_human,
-        "needs_human_confidence": 0.9,
+        "tier_answer": tier,
+        "tier_confidence": 0.9,
+        "needs_tools_answer": needs_tools,
+        "needs_tools_confidence": 0.9,
+        "is_sensitive_answer": is_sensitive,
+        "is_sensitive_confidence": 0.9,
     }
 
 

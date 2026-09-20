@@ -18,14 +18,14 @@ def test_backend_is_built_and_warmed_once_before_ready() -> None:
 
     with TestClient(create_app(backend_builder=builder)) as client:
         health = client.get("/health")
-        first = client.post("/triage", json={"message": "I was charged twice."})
+        first = client.post("/triage", json={"message": "Design our sharding strategy."})
 
     assert len(builds) == 1
     assert backend.warmup_calls == 1
     assert health.json()["status"] == "ready"
     assert health.json()["warmup_seconds"] == 0.25
     assert first.status_code == 200
-    assert first.json()["decisions"]["queue"]["answer"] == "billing"
+    assert first.json()["decisions"]["tier"]["answer"] == "medium"
 
 
 def test_triage_returns_every_question_in_the_schema() -> None:
@@ -34,7 +34,7 @@ def test_triage_returns_every_question_in_the_schema() -> None:
         schema = client.get("/questions").json()
 
     assert set(body["decisions"]) == set(schema)
-    assert set(schema) == {"queue", "urgent", "needs_human"}
+    assert set(schema) == {"tier", "needs_tools", "is_sensitive"}
 
 
 def test_invalid_requests_are_rejected_before_the_model_runs() -> None:

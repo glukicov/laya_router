@@ -1,35 +1,54 @@
 [
   {
     "variant": "shipped",
-    "options": 6,
-    "n": 150,
-    "accuracy": 0.6733333333333333,
-    "macro_f1": 0.6634969818683603,
-    "other_rate": 0.31333333333333335,
-    "n_common": 130,
-    "accuracy_common": 0.6384615384615384,
-    "macro_f1_common": 0.6937772144603265
+    "n": 180,
+    "accuracy": 0.6,
+    "macro_f1": 0.5350109609061017,
+    "overspend_rate": 0.10555555555555556,
+    "underspend_rate": 0.29444444444444445,
+    "share": {
+      "small": 0.5444444444444444,
+      "medium": 0.13333333333333333,
+      "powerful": 0.32222222222222224
+    }
   },
   {
-    "variant": "sharpened",
-    "options": 6,
-    "n": 150,
-    "accuracy": 0.6466666666666666,
-    "macro_f1": 0.6332726931664822,
-    "other_rate": 0.3,
-    "n_common": 130,
-    "accuracy_common": 0.6153846153846154,
-    "macro_f1_common": 0.6615256002912705
+    "variant": "names only",
+    "n": 180,
+    "accuracy": 0.42777777777777776,
+    "macro_f1": 0.37193501121614087,
+    "overspend_rate": 0.15,
+    "underspend_rate": 0.4222222222222222,
+    "share": {
+      "small": 0.3333333333333333,
+      "medium": 0.6388888888888888,
+      "powerful": 0.027777777777777776
+    }
   },
   {
-    "variant": "no-catch-all",
-    "options": 5,
-    "n": 130,
-    "accuracy": 0.7153846153846154,
-    "macro_f1": 0.7071088142405972,
-    "other_rate": 0.0,
-    "n_common": 130,
-    "accuracy_common": 0.7153846153846154,
-    "macro_f1_common": 0.7071088142405972
+    "variant": "example-led",
+    "n": 180,
+    "accuracy": 0.6388888888888888,
+    "macro_f1": 0.6305460621250095,
+    "overspend_rate": 0.10555555555555556,
+    "underspend_rate": 0.25555555555555554,
+    "share": {
+      "small": 0.38333333333333336,
+      "medium": 0.42777777777777776,
+      "powerful": 0.18888888888888888
+    }
+  },
+  {
+    "variant": "cost-framed",
+    "n": 180,
+    "accuracy": 0.4388888888888889,
+    "macro_f1": 0.42259353568514113,
+    "overspend_rate": 0.26666666666666666,
+    "underspend_rate": 0.29444444444444445,
+    "share": {
+      "small": 0.17777777777777778,
+      "medium": 0.7055555555555556,
+      "powerful": 0.11666666666666667
+    }
   }
 ]

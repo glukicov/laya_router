@@ -1,11 +1,12 @@
-"""One ablation: does the wording of the option descriptions move the answers?
+"""One ablation: how much of the routing decision comes from the wording of the tier descriptions?
 
-The first Laya run put most `sales` and `account` messages into `other`, which is the option described as
-"none of the above fits". That is a hypothesis about the schema, not about the model, and it is cheap to test:
-keep the model, the messages and the labels fixed, change only how the six queues are described, and re-score.
+A router's options are not fixed facts, they are three sentences someone wrote. If rewording them moves the
+route substantially, then any accuracy number is partly a number about that prose — worth knowing before
+trusting either backend's score.
 
-The variants are scored on the same 150 messages the hypothesis came from, so this measures how sensitive the
-answers are to wording. It does not establish that the sharper wording generalises.
+Model, requests and labels stay fixed; only the three tier descriptions change, and the answers are re-scored.
+The variants are evaluated on the same messages that generated the hypothesis, so this measures sensitivity to
+wording. It does not establish that any variant generalises.
 """
 
 from collections.abc import Sequence
@@ -14,35 +15,40 @@ from typing import Any
 from laya_router.backends.base import Backend
 from laya_router.data import Request
 from laya_router.metrics import macro_f1
-from laya_router.questions import QUESTIONS
+from laya_router.questions import QUESTIONS, TIER_ORDER
 
-#: The shipped descriptions, restated so the variants can be read side by side.
-BASELINE = QUESTIONS["queue"]["criteria"]
+#: The shipped descriptions, named so the variants can be read side by side.
+BASELINE: dict[str, str] = dict(QUESTIONS["tier"]["criteria"])
 
-#: Every queue gets concrete surface forms, and `other` stops being an open invitation.
-SHARPENED = {
-    "billing": "invoices, charges, refunds, plans, payment methods, tax, receipts, purchase orders",
-    "technical": "bugs, outages, errors, integrations, API problems, SDKs, performance, documentation",
-    "sales": "pricing, quotes, demos, trials, upgrades, renewals, contracts, procurement, partnerships",
-    "account": "login, passwords, two-factor, SSO, permissions, seats, user management, profile and data requests",
-    "abuse": "spam, phishing, fraud, harassment, impersonation, or a compromised or misused account",
-    "other": "only when the message is about none of these: press, careers, events, feedback, or a wrong recipient",
+#: Names only. Whatever the model already associates with small, medium and powerful, and nothing else.
+BARE = {"small": "", "medium": "", "powerful": ""}
+
+#: Concrete requests instead of abstract categories.
+EXAMPLE_LED = {
+    "small": "like: convert these units, fix this typo, what is the capital of Peru, reformat this list",
+    "medium": "like: write this function, summarise this document, explain this error, draft this email",
+    "powerful": "like: design this system, is this contract enforceable, prove this, plan this migration",
 }
 
-#: Removing the catch-all entirely: five real queues and nothing to fall back on.
-NO_CATCH_ALL = {name: text for name, text in SHARPENED.items() if name != "other"}
+#: Cost framed as the decision, rather than capability. A router's actual job is to not overspend.
+COST_FRAMED = {
+    "small": "cheapest: use it whenever it would plausibly be enough",
+    "medium": "roughly ten times the cost of small: use it when small would clearly fail",
+    "powerful": "roughly a hundred times the cost of small: use it only when being wrong would be expensive",
+}
 
 VARIANTS: dict[str, dict[str, str]] = {
-    "shipped": dict(BASELINE),
-    "sharpened": SHARPENED,
-    "no-catch-all": NO_CATCH_ALL,
+    "shipped": BASELINE,
+    "names only": BARE,
+    "example-led": EXAMPLE_LED,
+    "cost-framed": COST_FRAMED,
 }
 
 
 def questions_for(criteria: dict[str, str]) -> dict[str, Any]:
-    """The shipped question set with only the queue descriptions swapped."""
+    """The shipped question set with only the tier descriptions swapped."""
     questions = {qid: dict(q) for qid, q in QUESTIONS.items()}
-    questions["queue"] = {**questions["queue"], "criteria": criteria}
+    questions["tier"] = {**questions["tier"], "criteria": criteria}
     return questions
 
 
@@ -51,43 +57,41 @@ def run(
     requests: Sequence[Request],
     variants: dict[str, dict[str, str]] | None = None,
 ) -> list[dict[str, Any]]:
-    """Re-answer the queue question under each wording and score it.
+    """Re-answer the tier question under each wording and score it.
 
-    Only the queue question is asked, because only its options change; the yes/no questions are untouched and
-    re-running them would just burn time for identical answers.
+    Only the tier question is asked: it is the only one whose options change, and re-running the two yes/no
+    questions would burn time for identical answers.
     """
     agent = getattr(backend, "agent", None)
     if agent is None:
         raise TypeError("the ablation needs a backend with a resident Laya agent")
 
-    chosen = variants or VARIANTS
-    # Removing an option also removes the messages it was the right answer for, and those are not a random
-    # sample: they are exactly the hard ones. Scoring each variant on its own subset would compare a 5-way
-    # problem on 130 easy messages with a 6-way problem on 150, and call the difference an improvement. So
-    # every variant is also scored on the messages every variant can answer.
-    common_queues = set.intersection(*(set(criteria) for criteria in chosen.values()))
-    common = [r for r in requests if r.labels["queue"] in common_queues]
-
     rows: list[dict[str, Any]] = []
-    for name, criteria in chosen.items():
-        questions = {"queue": questions_for(criteria)["queue"]}
-        scorable = [r for r in requests if r.labels["queue"] in criteria]
-        predicted = {
-            r.id: str(agent.predict({"message": r.message}, questions)["answers"]["queue"]["choice"]) for r in scorable
-        }
-        gold = {r.id: r.labels["queue"] for r in scorable}
-        common_ids = [r.id for r in common]
+    for name, criteria in (variants or VARIANTS).items():
+        questions = {"tier": questions_for(criteria)["tier"]}
+        predicted = [
+            str(agent.predict({"message": r.message}, questions)["answers"]["tier"]["choice"]) for r in requests
+        ]
+        gold = [r.labels["tier"] for r in requests]
         rows.append(
             {
                 "variant": name,
-                "options": len(criteria),
-                "n": len(scorable),
-                "accuracy": sum(predicted[i] == gold[i] for i in predicted) / len(predicted),
-                "macro_f1": macro_f1(list(predicted.values()), list(gold.values())),
-                "other_rate": list(predicted.values()).count("other") / len(predicted),
-                "n_common": len(common_ids),
-                "accuracy_common": sum(predicted[i] == gold[i] for i in common_ids) / len(common_ids),
-                "macro_f1_common": macro_f1([predicted[i] for i in common_ids], [gold[i] for i in common_ids]),
+                "n": len(requests),
+                "accuracy": sum(p == g for p, g in zip(predicted, gold, strict=True)) / len(gold),
+                "macro_f1": macro_f1(predicted, gold),
+                "overspend_rate": _overspend(predicted, gold),
+                "underspend_rate": _underspend(predicted, gold),
+                "share": {tier: predicted.count(tier) / len(predicted) for tier in TIER_ORDER},
             }
         )
     return rows
+
+
+def _overspend(predicted: Sequence[str], gold: Sequence[str]) -> float:
+    """Share of requests sent to a more expensive tier than they needed. This costs money."""
+    return sum(TIER_ORDER.index(p) > TIER_ORDER.index(g) for p, g in zip(predicted, gold, strict=True)) / len(gold)
+
+
+def _underspend(predicted: Sequence[str], gold: Sequence[str]) -> float:
+    """Share of requests sent to a tier too weak for them. This costs answer quality."""
+    return sum(TIER_ORDER.index(p) < TIER_ORDER.index(g) for p, g in zip(predicted, gold, strict=True)) / len(gold)

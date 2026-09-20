@@ -1,166 +1,240 @@
 # The experiment
 
-One triage job, answered by two very different things, scored the same way.
+A router sits in front of a fleet of models and decides, per request, which tier should answer: `small` for
+routine work, `medium` for general analysis, `powerful` for genuinely hard or high-stakes requests. It runs on
+**every** request, so its own latency and cost are pure overhead on top of the model that does the work.
 
-- **What is asked.** For each inbound support message: which of six queues owns it (`queue`), whether it is
-  urgent (`urgent`), and whether a human must handle it rather than an automated reply (`needs_human`).
+That is what makes a 421M encoder an interesting thing to put there — and what this experiment measures.
+
 - **Laya.** `convaiinnovations/laya`, 421M parameters, a ModernBERT-large encoder with a typed decision head.
-  It is not generative: all three questions are answered in one forward pass, as probabilities over the
-  options, with no tokens produced and nothing to parse.
-- **The traditional classifier.** A hosted OpenAI model given the same questions and a strict JSON schema,
-  asked to fill it in and to state its own confidence.
-- **Same contract.** Both return the identical object (`src/laya_router/schema.py`), and the OpenAI prompt and
-  JSON schema are *generated* from the same question dictionary Laya consumes, so neither side gets wording the
-  other did not (`src/laya_router/questions.py`).
+  Not generative: all three questions are answered in **one forward pass** as probabilities over the options.
+  No tokens produced, nothing to parse.
+- **GPT-5 nano.** The same three questions, given as a prompt with a strict JSON schema, plus a request for
+  its own confidence. This is how most routers are built today.
+- **Same contract.** Both return the identical object (`src/laya_router/schema.py`). The OpenAI prompt and its
+  JSON schema are *generated from* the question dictionary Laya consumes (`src/laya_router/questions.py`), so
+  neither side is given wording the other did not.
 
-Everything below comes from `results/`, which is committed. Nothing here is a vendor benchmark.
+Everything below comes from `results/`, which is committed.
 
 ## Setup
 
 | | |
 |---|---|
 | Machine | Apple M4, 10 cores, 32 GB, macOS 27 |
-| Laya | `convaiinnovations/laya` (English root checkpoint, 512-token context), FP32, `torch.inference_mode()` |
-| Devices measured | Apple MPS (native), CPU (native), CPU (container on kind) |
-| Dataset | 150 hand-labelled messages, `data/requests.jsonl` ([how it was built](../data/README.md)) |
+| Laya | English root checkpoint, 512-token context, FP32 on Apple MPS, `torch.inference_mode()` |
+| GPT-5 nano | `gpt-5-nano`, chat completions, strict JSON schema, default sampling |
+| Dataset | 180 labelled requests, `data/requests.jsonl` ([how it was built](../data/README.md)) |
 | Requests | Sent one at a time, in order, no concurrency |
 
-Requests are strictly sequential on purpose. A concurrent run would measure the client's pipelining rather
-than time-to-one-decision, and the two backends would stop being comparable.
+Sequential on purpose: a concurrent run would measure the client's pipelining rather than time-to-one-decision,
+and the two routers would stop being comparable.
 
-## Laya: what a 421M encoder gets you
+## The result
 
-| | accuracy | macro F1 | ECE | mean stated confidence |
-|---|---:|---:|---:|---:|
-| `queue` (6 options) | 0.673 | 0.663 | 0.095 | 0.622 |
-| `urgent` (yes/no) | 0.807 | — | 0.063 | 0.823 |
-| `needs_human` (yes/no) | 0.687 | — | 0.176 | 0.841 |
-| **all three correct** | **0.407** | | | |
+![hero](../drafts/hero.png)
 
-Overall accuracy across the 450 individual decisions is **0.722**, with an overall ECE of **0.083**.
+| | route accuracy | macro F1 | too expensive | too weak | `needs_tools` | `is_sensitive` | ECE | p50 | p99 | per 1,000 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| **Laya 421M, local** | **0.600** | 0.535 | 10.6% | 29.4% | **0.867** | 0.733 | **0.093** | **184 ms** | **233 ms** | **$0.00** |
+| **GPT-5 nano** | **0.600** | 0.559 | 3.9% | 36.1% | 0.711 | **0.894** | 0.172 | 6,415 ms | 14,751 ms | $0.58 |
+
+**The routing accuracy is a tie.** Both put 60% of the 180 requests in the right tier. The 421M model does it
+in 184 ms on a laptop for nothing; the hosted model takes **6.4 seconds** and **$0.58 per thousand routes**.
+
+The latency is not a fluke of a slow endpoint. GPT-5 nano is a reasoning model, and it spent **252,246 output
+tokens** across 180 routing decisions — about 1,400 tokens of thinking to answer "which of these three". Laya
+produced **zero** output tokens, because there is no text to produce.
+
+![cost and latency](figures/cost_latency.png)
+
+## They tie on the total, and fail in mirror images
+
+![where the traffic goes](figures/tier_share.png)
+
+| gold ↓ / routed → | small | medium | powerful | | recall |
+|---|---:|---:|---:|---|---:|
+| **Laya** | | | | | |
+| small (63) | **61** | 1 | 1 | | 0.97 |
+| medium (56) | 32 | **7** | 17 | | **0.13** |
+| powerful (61) | 5 | 16 | **40** | | 0.66 |
+| **GPT-5 nano** | | | | | |
+| small (63) | **56** | 3 | 4 | | 0.89 |
+| medium (56) | 17 | **39** | 0 | | 0.70 |
+| powerful (61) | 7 | 41 | **13** | | **0.21** |
+
+Two routers, the same score, opposite failures:
+
+- **Laya is a two-tier router wearing three tiers.** It sends 97% of `small` work to `small` — near perfect —
+  and finds two thirds of the `powerful` work. But it barely believes in the middle: it routes 13% of traffic
+  to `medium` when 31% belongs there, and gets 7 of 56 right. Its mistakes split, 32 down and 17 up.
+- **GPT-5 nano collapses everything into the middle.** It routes 46% of traffic to `medium` against a true 31%,
+  and sends **41 of 61 `powerful` requests to `medium`**. Only 9.4% of traffic reaches `powerful`, against a
+  true 34%.
+
+![routing errors](figures/routing_errors.png)
+
+This is why "too expensive" and "too weak" are reported separately. Nano's 3.9% overspend looks like the
+frugal choice next to Laya's 10.6% — but it is not frugality, it is under-provisioning: nano is **too weak on
+36.1%** of requests against Laya's 29.4%, and is two tiers off twice as often (6.1% vs 3.3%). A single accuracy
+number hides which mistake a router prefers, and that preference is the entire design question.
+
+## Where each one is actually better
 
 ![accuracy](figures/accuracy.png)
 
-### Where it fails, and why that is the interesting part
+The two yes/no questions split cleanly, and not in the direction the parameter counts suggest:
 
-The queue confusion matrix is not evenly spread. Laya is solid where the vocabulary is distinctive and falls
-apart where the category is a matter of internal policy:
-
-| gold ↓ / predicted → | billing | technical | sales | account | abuse | other |
-|---|---:|---:|---:|---:|---:|---:|
-| **billing** (30) | **26** | 1 | 2 | 0 | 0 | 1 |
-| **technical** (31) | 2 | **24** | 1 | 0 | 0 | 4 |
-| **sales** (24) | 2 | 2 | **10** | 0 | 0 | 10 |
-| **account** (25) | 1 | 4 | 0 | **8** | 0 | 12 |
-| **abuse** (20) | 1 | 1 | 0 | 1 | **15** | 2 |
-| **other** (20) | 1 | 1 | 0 | 0 | 0 | **18** |
-
-Billing, technical, abuse and other land at 80–90%. Sales (10/24) and account (8/25) collapse, and both
-collapse the same way: into `other`. Laya predicts `other` for **47 of 150** messages when the true answer is
-20 — over-predicting the catch-all by 2.4×.
-
-`needs_human` is the worst-calibrated question (ECE 0.176) and the reason is not subtle: it is not a property
-of the message, it is a property of *the company's escalation policy*. The gold rule here is "money moving,
-legal, security, or a distressed customer" (see [`data/README.md`](../data/README.md)). A zero-shot model has
-never seen that rule. It is not reading the message wrong; it is guessing a policy it was never told.
-
-![difficulty](figures/difficulty.png)
-
-Broken down by how each message was written, the all-three-correct rate is 0.42 on `clear` messages, 0.55 on
-`terse` ones — and **0.15 on the 20 `mixed` messages**, where two queues are genuinely in play. Terse beating
-clear is a sample-size artefact at n=20, not a finding.
-
-### The confidence is worth something
+- **`needs_tools` — Laya 0.867, nano 0.711.** Whether the request needs something it does not already carry.
+  Laya is 15 points better and far better calibrated (ECE 0.067 vs 0.339).
+- **`is_sensitive` — nano 0.894, Laya 0.733.** Whether the subject matter carries consequences in money, law,
+  health or safety. Here the big model's world knowledge earns its keep: recognising that a settlement offer
+  or a warfarin interaction is high-stakes is exactly what a 421M encoder has less of.
 
 ![calibration](figures/calibration.png)
 
-Laya's probabilities track the diagonal closely enough to threshold on. That matters more than the headline
-accuracy, because it is what makes partial automation safe: answer the confident decisions, escalate the rest.
+Laya's overall ECE is **0.093** against nano's **0.172**: its probabilities mean closer to what they say. One
+methodological note that mattered — Laya's SDK reports a `confidence` field for choice questions that is
+*normalised entropy*, `1 − H(p)/log k`, a measure of how peaked the distribution is rather than the
+probability the answer is right. Comparing that against a model's self-reported P(correct) is not
+like-for-like, so this evaluation uses the probability of the chosen option instead. Using the SDK field
+would have reported Laya's ECE as 0.295 rather than 0.158 on an earlier run of this task — a bug in the
+harness, not in the model.
 
 ![deferral](figures/deferral.png)
 
-| answered automatically | accuracy of what was answered |
-|---:|---:|
-| 5% | 0.955 |
-| 25% | 0.893 |
-| 45% | 0.847 |
-| 65% | 0.815 |
-| 85% | 0.770 |
-| 100% | 0.722 |
+Thresholding on confidence works about equally well for both at low coverage, and better for Laya as coverage
+grows: acting on the most confident 85% of decisions leaves 0.791 accuracy for Laya against 0.710 for nano.
 
-Taking the most confident quarter of decisions gets you **89% accuracy on that quarter**, against 72% if you
-accept everything. The confidence score is doing real work, which is exactly what an ECE of 0.083 predicts.
+## Three sentences are worth more than 35× the latency
 
-### Speed, and where the container tax lands
+The tiers are not fixed facts. They are three sentences somebody wrote. So: hold the model, the requests and
+the labels fixed, change only the descriptions, and re-score (`src/laya_router/ablation.py`).
 
-| Where it runs | cold load | warm-up | p50 | p99 |
-|---|---:|---:|---:|---:|
-| Native, Apple MPS | 23.2 s | 0.48 s | **157 ms** | 198 ms |
-| Native, CPU | — | — | 248 ms | 361 ms |
-| Container on kind (Docker Desktop, 8 CPUs) | 12.9 s | 1.46 s | **953 ms** | — |
+![ablation](figures/ablation.png)
 
-The three runs produce **identical answers** — this model is deterministic, so only the clock changes. Two
-things are worth noting. The cold load is 23 seconds and must be paid once, which is why the service keeps the
-model resident and only reports ready after warm-up. And a Linux container on macOS cannot reach Apple's MPS
-backend, so the kind deployment is **6× slower than the native service on the same laptop** — not a Kubernetes
-cost, a virtualisation one. On a Linux host with a GPU this gap would not exist.
+| tier wording | route accuracy | macro F1 | too expensive | too weak | share small / medium / powerful |
+|---|---:|---:|---:|---:|---|
+| shipped | 0.600 | 0.535 | 10.6% | 29.4% | 54% / 13% / 32% |
+| names only, no descriptions | 0.428 | 0.372 | 15.0% | 42.2% | 33% / 64% / 3% |
+| **example-led** | **0.639** | **0.631** | 10.6% | 25.6% | 38% / 43% / 19% |
+| cost-framed | 0.439 | 0.423 | 26.7% | 29.4% | 18% / 71% / 12% |
+| *GPT-5 nano, for reference* | *0.600* | *0.559* | *3.9%* | *36.1%* | *44% / 46% / 9%* |
 
-Laya generated **zero output tokens** across all 150 messages. It read 41,130 input tokens and wrote nothing,
-because there is no text to write.
+**Rewording three sentences moves routing accuracy by 21 points** — from 0.428 to 0.639 — with the model and
+the data untouched. That range is larger than the entire gap between the two routers.
 
-## Does the wording of the options move the answers?
+Replacing abstract category descriptions with concrete example requests ("like: convert these units, fix this
+typo") takes Laya's macro F1 from 0.535 to **0.631**, past GPT-5 nano's 0.559, while still answering in under
+200 ms for nothing. Framing the tiers by cost rather than capability was the second-worst option tested: told
+that `powerful` costs a hundred times `small`, the model stopped using it and piled 71% of traffic into
+`medium`.
 
-The `other` over-prediction is a hypothesis about the schema, not the model, and it is cheap to test: keep the
-model, messages and labels fixed, change only how the six queues are described (`src/laya_router/ablation.py`).
+**The honest caveat.** These variants are scored on the same 180 requests that suggested them, so
+`example-led` beating nano is a sensitivity result, not a validated improvement — you would need a held-out
+set to claim the latter. What *is* robust is the spread: most of the published difference between two routers
+on a task like this can be prose.
 
-| queue wording | options | macro F1 (own set) | macro F1 (same 130 messages) | answered `other` |
-|---|---:|---:|---:|---:|
-| shipped | 6 | 0.663 (n=150) | 0.694 | 31.3% |
-| sharpened descriptions | 6 | 0.633 (n=150) | 0.662 | 30.0% |
-| catch-all removed | 5 | 0.707 (n=130) | 0.707 | 0.0% |
+## Auditing the gold labels (and the audit)
 
-Two results, one of them a correction to my own first reading.
+The labels were written by one person, the weakest part of any hand-built set. So they were checked against
+GPT-5 — a far stronger, independent model. Getting that check right took two attempts, and the failed one is
+worth reporting.
 
-**Rewriting the descriptions made it worse**, not better. Giving every queue concrete surface forms
-("renewals, procurement, partnerships") and narrowing `other` to a closed list moved macro F1 *down* by 3
-points and barely touched the `other` rate. Whatever is pulling sales and account into the catch-all is not
-the wording.
+### The first design was wrong
 
-**Removing the catch-all looks like a 4.4-point win and is not.** Dropping `other` also drops the 20 messages
-it was the correct answer for — and those are not a random sample, they are messages with no clean home. Score
-every variant on the 130 messages all three can answer and the gain shrinks to **1.3 points**, which at n=130
-is inside the noise. The honest conclusion is the negative one: the model's difficulty separating sales and
-account from a catch-all is real, and neither rewording nor removing the option fixes it.
+The first version showed GPT-5 each request **together with the proposed labels** and asked whether it agreed.
+It upheld 138 of 180 and objected to 42. One objection was a fair cop: I had marked "explain *this* stack
+trace" and "a cover letter based on *this* CV" as needing tools, when by my own stated rule — "requires
+something *outside the model*" — the material arrives with the request. The rule was ambiguous about deictic
+references. I tightened the wording, relabelled all 23 affected rows across the whole set (not only the
+disputed ones, which would have been cherry-picking), updated the question both routers are asked, and re-ran
+everything.
 
-## Auditing the gold labels
+Then I re-ran the audit on the corrected labels, expecting agreement to rise. It did not move: 135 of 180.
+And the disputes had **inverted**. The very rows GPT-5 had told me to flip to `false` — `sml-13`, `med-02`,
+`med-08`, `med-11`, `med-30` — it now insisted should be `true`.
 
-The labels were written by one person, which is the weakest part of any hand-built set. `laya-router eval
-adjudicate` re-checks every one with a stronger, independent model and records the disagreements in
-`results/adjudication.jsonl`, so the write-up can report how many there are rather than assert the labels are
-obviously right.
+That is not a model changing its mind on evidence. It is anchoring: shown a label and asked to judge it, it
+objects at a fairly stable rate in whichever direction the label points. **An "agreement rate" measured that
+way is close to meaningless**, and if I had only run it once I would have published it as validation.
+
+### The second design: label blind, then compare
+
+The shipped `laya-router eval adjudicate` never shows GPT-5 the gold labels. It asks it to label each request
+from scratch, and agreement is computed afterwards — the ordinary way to measure inter-annotator agreement.
+
+| | blind agreement with the gold labels |
+|---|---:|
+| `tier` | **0.817** |
+| `needs_tools` | 0.717 |
+| `is_sensitive` | **0.944** |
+| all three at once | 0.572 |
+
+Three things follow.
+
+**The ceiling on `tier` is about 0.82, not 1.0.** A frontier model and the annotator agree on the routing tier
+four times in five. Two routers scoring 0.600 therefore have real headroom — but roughly 22 points of it, not
+40. A 4-point difference between them is noise against that backdrop.
+
+**`is_sensitive` is a well-defined question and `needs_tools` is not.** 0.944 against 0.717. The tools
+question survived a rewrite and still only draws three-quarters agreement, which says the ambiguity is in the
+concept rather than in my prose. Its accuracy numbers should be read with that in mind.
+
+**GPT-5 is, incidentally, a much better router than GPT-5 nano.** Labelling blind, it lands at 0.817 on `tier`
+against nano's 0.600 — so the capability gap between router models is real and large. It is also the most
+expensive way imaginable to make this decision: on this task nano already costs $0.58 per thousand routes at
+6.4 seconds each, and GPT-5 is roughly an order of magnitude beyond that. Paying frontier prices on every
+request to save money on some of them is the trade this whole exercise is about.
+
+## Running it somewhere other than a laptop
+
+| Where | cold load | warm-up | p50 |
+|---|---:|---:|---:|
+| Native, Apple MPS | 23.2 s | 0.48 s | **184 ms** |
+| Native, CPU | — | — | 260 ms |
+| Container on kind (Docker Desktop, 8 CPUs) | 10.5 s | 1.15 s | **927 ms** |
+
+All three produce **identical answers** — the model is deterministic, so only the clock changes. Two things
+worth knowing. The cold load is 23 seconds and must be paid once, which is why the service keeps the model
+resident and reports ready only after warm-up. And a Linux container on macOS cannot reach Apple's MPS
+backend, so the kind deployment is **5× slower than the native service on the same machine** — a
+virtualisation cost, not a Kubernetes one. On a Linux host it would not appear.
+
+Even at 927 ms in a container on the wrong platform, the local router is still 7× faster than the API call.
 
 ## Limitations
 
-- **150 messages.** Differences smaller than about 8 percentage points should not be read as real, and the
-  per-difficulty buckets (n=11 to n=86) are smaller still.
-- **The messages are written, not collected.** See [`data/README.md`](../data/README.md).
-- **One machine, one checkpoint.** Apple M4, the English 421M checkpoint. The SDK also ships a multilingual
-  checkpoint and a typed-decisions checkpoint fine-tuned on four synthetic workflows; neither is measured here.
-- **Zero-shot, both sides.** Neither backend was given examples, fine-tuned, or had its probabilities
-  temperature-fitted on this domain. Laya's model card explicitly asks for domain calibration before
-  operational use, and this evaluation deliberately skips it to measure what you get out of the box.
-- **The ablation is scored on the messages that generated its hypothesis**, so it measures sensitivity to
-  wording, not a validated improvement.
-- **Prices are a February 2026 snapshot** and are overridable with `--price-in` / `--price-out`.
+- **180 requests.** Differences smaller than about 7 points are inside the noise, and the per-difficulty
+  buckets (n=9 to n=118) are smaller still. The tie at 0.600 should be read as "no measurable difference",
+  not as an exact equality.
+- **The requests are written, not collected**, by one annotator, and a strong independent model disagrees with
+  about a quarter of the labels. See the audit above and [`data/README.md`](../data/README.md).
+- **The tier policy is a judgement call.** "Cheapest tier that can do it well" is a policy, not a fact. This
+  measures routers against a *stated* policy, which is the only thing a router can be measured against.
+- **Zero-shot, both sides.** No examples, no fine-tuning, no domain temperature fitting — which Laya's model
+  card explicitly asks for before operational use. Fitting it on a held-out slice would likely improve the
+  calibration numbers.
+- **One model per side.** `gpt-5-nano` is one point in a large space; a non-reasoning model would be much
+  faster and might route differently. An earlier run of a different task with `gpt-5-mini` cost $0.90 per
+  1,000 at 3.4 s per decision.
+- **The adjudicator shares a lineage with the model under test.** GPT-5 labelling a task that GPT-5 nano is
+  scored on is not a fully independent reader, and it will share some of nano's blind spots. A second human
+  annotator would be better evidence than any model.
+- **The ablation is scored on the data that generated its hypothesis**, so it measures sensitivity to wording,
+  not a validated improvement.
+- **Prices are a February 2026 snapshot**, overridable with `--price-in` / `--price-out`.
 
 ## Reproducing
 
 ```bash
 uv sync --all-extras
-uv run laya-router eval run --backend laya --device mps     # results/laya.jsonl
-uv run laya-router eval run --backend openai                # results/openai.jsonl, needs OPENAI_API_KEY
-uv run laya-router eval report                              # results/metrics.json + the summary table
-uv run laya-router figures                                  # docs/figures/*.png
-uv run laya-router eval ablate --device mps                 # results/ablation.json
-uv run laya-router eval adjudicate                          # results/adjudication.jsonl
+uv run laya-router eval run --backend laya --device mps    # results/laya.jsonl
+uv run laya-router eval run --backend openai               # results/openai.jsonl, needs OPENAI_API_KEY
+uv run laya-router eval report                             # results/metrics.json + the table above
+uv run laya-router figures                                 # docs/figures/*.png
+uv run laya-router eval ablate --device mps                # results/ablation.json + the ablation figure
+uv run laya-router eval adjudicate                         # results/adjudication.jsonl
 ```
+
+The whole OpenAI side of this study cost **$0.10**.
