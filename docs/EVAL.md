@@ -224,6 +224,13 @@ request to save money on some of them is the trade this whole exercise is about.
 | Native, Apple MPS | 23.2 s | 0.48 s | **184 ms** |
 | Native, CPU | — | — | 260 ms |
 | Container on kind (Docker Desktop, 8 CPUs) | 10.5 s | 1.15 s | **927 ms** |
+| Native, NVIDIA GB10 / DGX Spark, CUDA (`typed-decisions` checkpoint)¹ | 29.6 s | — | **100 ms** |
+| Native, CPU, Ryzen 9 6900HX under WSL2, 8 intra-op / 1 inter-op threads¹ | — | — | 440 ms |
+
+¹ Contributed from an independent reproduction (below), measured through an HTTP wrapper around
+`Agent.system_one` on a host shared with other workloads. On CUDA vs CPU, accuracy on the 180 requests agreed
+to within one row per wording rather than exactly (0.700 vs 0.694 on example-led), so "identical answers"
+holds to floating-point noise between backends, not bit for bit.
 
 All three produce **identical answers** — the model is deterministic, so only the clock changes. Two things
 worth knowing. The cold load is 23 seconds and must be paid once, which is why the service keeps the model
@@ -232,6 +239,42 @@ backend, so the kind deployment is **5× slower than the native service on the s
 virtualisation cost, not a Kubernetes one. On a Linux host it would not appear.
 
 Even at 927 ms in a container on the wrong platform, the local router is still 7× faster than the API call.
+
+## An independent reproduction
+
+A second team re-ran this experiment on their own harness while building a router on Laya, with the same 180
+requests and labels, and contributed the results below. Everything is on this repo's public data, and all of it
+is scored on the same 180 requests, so the ±9.5-point caveat in Limitations applies throughout.
+
+**The harness matches to three decimals.** Sending the state under `message`, as `backends/laya` does, gave
+0.600 accuracy / 0.535 macro F1 on the shipped wording and 0.639 / 0.631 on example-led, the same as the table
+above. Renaming the state key to `request` moved example-led +2.2 points and shipped −1.1. That is inside the
+noise, but it shows the state's key name is part of the prompt.
+
+**Example-led wins again, across option orders.** A `choice` question lays its options out in order, and each
+is read off its own mask position, so option order is part of the prompt too. All six orders of the three
+tiers were run for three wordings (shipped, example-led, and one of the reproducers' own). All six example-led
+orders beat all twelve others, a clean 6-vs-12 separation, with a best of **0.744** accuracy / 0.738 macro F1
+(order `powerful, medium, small`). That wording result is robust.
+
+**The order effect is not.** Within one wording, the best and worst orders were 4.5, 8.3 and 12.8 points
+apart, all inside the ±9.5 band. The best order for one wording was fifth of six for another. There is no rule
+like "put the expensive option first", so any order result needs a larger corpus.
+
+**The `typed-decisions` checkpoint agrees.** Across the four wordings in the ablation table above, example-led
+was again best (0.694), and names-only again worst (0.444).
+
+**Nearly every configuration was under-confident.** P(chosen) averaged 0.56 against 0.744 accuracy on the
+best configuration, a gap of about −0.18. The only over-confident configurations (+0.01 to +0.06) were among
+the least accurate. A router that reads confidence
+only to become more careful is pushed in the safe direction. It also means ECE alone is a poor selector here:
+names-only had the best ECE measured (0.030) and the worst accuracy.
+
+**A bench question is not a router's question.** The same brain, asked through a router that adds session and
+environment state to the request, returns flatter probabilities. A confidence floor of 0.45 held 18.3% of
+decisions on these 180 bare requests, but 78.2% of decisions on a 240-request set (this corpus plus 60
+private requests) when asked through the router. Calibrate thresholds through the deployed prompt, not the
+bench prompt.
 
 ## Limitations
 
